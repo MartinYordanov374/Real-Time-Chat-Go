@@ -1,0 +1,9 @@
+martin@martin-MS-7C52:~/Desktop/Real-Time-Chat-Go/Backend/Handlers$ ls
+Handlers.go
+martin@martin-MS-7C52:~/Desktop/Real-Time-Chat-Go/Backend/Handlers$ cd ..
+martin@martin-MS-7C52:~/Desktop/Real-Time-Chat-Go/Backend$ ls
+Dockerfile  Handlers  main.go
+martin@martin-MS-7C52:~/Desktop/Real-Time-Chat-Go/Backend$ mkdir Mongo
+martin@martin-MS-7C52:~/Desktop/Real-Time-Chat-Go/Backend$ cd Mongo/
+martin@martin-MS-7C52:~/Desktop/Real-Time-Chat-Go/Backend/Mongo$ touch ConnectToMongo.go
+martin@martin-MS-7C52:~/Desktop/Real-Time-Chat-Go/Backend/Mongo$ 
