@@ -59,3 +59,11 @@ func HashPassword(Password string) string{
 	HashedPassword := "Placeholder Value"
 	return HashedPassword
 }
+
+func UsernameExists(Username string) bool{
+	return false
+}
+
+func EmailExists(Email string) bool{
+	return false
+}
