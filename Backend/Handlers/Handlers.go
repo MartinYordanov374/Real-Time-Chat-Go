@@ -6,6 +6,7 @@ import (
 	"context"
 	"log"
 	"RealTimeChatApp/Backend/Mongo"
+	"regexp"
 )
 func Login(context *gin.Context){
 	context.JSON(200, gin.H{
@@ -22,6 +23,8 @@ func Register(GinContext *gin.Context){
 
 	newUser := MongoConfig.User{Username: UserData.Username, Password: UserData.Password, Email: UserData.Email}
 
+	ValidateUsername(UserData.Username)
+
 	res, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)
 
 	if error != nil{
@@ -32,12 +35,20 @@ func Register(GinContext *gin.Context){
 }
 
 
-func ValidateUsername(Username string){
-	// TODO: Validate username according to the below criteria:
-	// 1. The username does not contain special characters
-	// 2. The username is at least 2 characters long
-	// 3. Trim string input to remove whitespaces
-	// 4. Ensure that no other user is registered with the same username
+func ValidateUsername(Username string) bool{
+	if len(Username) >= 2{
+		UsernameRegex, _ := regexp.Compile("^[a-zA-Z]{2,}$")
+
+		ValidUsername := UsernameRegex.MatchString(Username)
+
+		if ValidUsername {
+			return true
+		}else{
+			return false
+		}
+	}else{
+		return false
+	}
 }
 
 func ValidatePassword(Password string){
