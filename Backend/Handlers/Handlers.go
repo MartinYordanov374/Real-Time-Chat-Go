@@ -16,7 +16,11 @@ func Login(context *gin.Context){
 
 func Register(GinContext *gin.Context){
 	newUser := MongoConfig.User{Username: "UserTemplate", HashedPassword: "nothashed", Email: "notmail"}
+	var UserData MongoConfig.User
+	GinContext.BindJSON(&UserData)
+	GinContext.JSON(200, UserData)
 
+	log.Println(UserData)
 	res, error := GlobalVariables.MongoCollection.InsertOne(context.TODO(), newUser)
 
 	if error != nil{
