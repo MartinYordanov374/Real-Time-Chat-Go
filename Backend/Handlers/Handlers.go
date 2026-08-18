@@ -24,6 +24,11 @@ func Register(GinContext *gin.Context){
 	newUser := MongoConfig.User{Username: UserData.Username, Password: UserData.Password, Email: UserData.Email}
 
 	ValidateUsername(UserData.Username)
+	if ValidatePassword(UserData.Password){
+		log.Println("Valid pass")
+	}else{
+		log.Println("Invalid pass")
+	}
 
 	res, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)
 
@@ -40,6 +45,7 @@ func ValidateUsername(Username string) bool{
 		UsernameRegex, _ := regexp.Compile("^[a-zA-Z]{2,}$")
 
 		ValidUsername := UsernameRegex.MatchString(Username)
+		// TODO: Check if the username is already taken
 
 		if ValidUsername {
 			return true
@@ -51,14 +57,28 @@ func ValidateUsername(Username string) bool{
 	}
 }
 
-func ValidatePassword(Password string){
-	// TODO: Validate password according to the following criteria:
-	// 1. The password is at least 15 characters long
-	// 2. It includes at least one upper-case character
-	// 3. It contains at least one special character
-	// 4. Trim to remove whitespace
-	// 5. At least one number
-	// 6. No consecutive repeating characters
+func ValidatePassword(Password string) bool{
+	// TODO: Move all regexes to a seperate file
+	if len(Password) >= 15{
+		AtLeastOneLowerCaseRegex:= regexp.MustCompile(`[a-z]`)
+		AtLeastOneUpperCaseRegex:= regexp.MustCompile(`[A-Z]`)
+		AtLeastOneDigitRegex := regexp.MustCompile(`[\\d]`)
+		SpecialRegex := regexp.MustCompile(`[^a-zA-Z0-9]`)
+
+		PasswordContainsLowerCase := AtLeastOneLowerCaseRegex.MatchString(Password)
+		PasswordContainsUpperCase := AtLeastOneUpperCaseRegex.MatchString(Password)
+		PasswordContainsDigit := AtLeastOneDigitRegex.MatchString(Password)
+		PasswordHasSpecialCharacter := SpecialRegex.MatchString(Password)
+
+
+		if (PasswordContainsLowerCase && PasswordContainsUpperCase && PasswordContainsDigit && PasswordHasSpecialCharacter){
+			return true
+		}else{
+			return false
+		}
+	}else{
+		return false
+	}
 }
 
 func ValidateEmail(Email string){
