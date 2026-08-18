@@ -7,6 +7,7 @@ import (
 	"log"
 	"RealTimeChatApp/Backend/Mongo"
 	"regexp"
+	"net/mail"
 )
 func Login(context *gin.Context){
 	context.JSON(200, gin.H{
@@ -24,10 +25,10 @@ func Register(GinContext *gin.Context){
 	newUser := MongoConfig.User{Username: UserData.Username, Password: UserData.Password, Email: UserData.Email}
 
 	ValidateUsername(UserData.Username)
-	if ValidatePassword(UserData.Password){
-		log.Println("Valid pass")
+	if ValidateEmail(UserData.Email){
+		log.Println("Valid mail")
 	}else{
-		log.Println("Invalid pass")
+		log.Println("Invalid mail")
 	}
 
 	res, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)
@@ -81,8 +82,16 @@ func ValidatePassword(Password string) bool{
 	}
 }
 
-func ValidateEmail(Email string){
+func ValidateEmail(Email string) bool{
 	// TODO: Use an already existing and a battle-proven regex for email verification
+	//
+	_, err := mail.ParseAddress(Email)
+	if err != nil{
+		return false
+	}else{
+		return true
+	}
+
 }
 
 func HashPassword(Password string) string{
