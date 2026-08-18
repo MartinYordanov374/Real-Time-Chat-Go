@@ -4,6 +4,7 @@ import(
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"log"
+	"context"
 )
 
 func ConnectToMongo(){
@@ -15,4 +16,10 @@ func ConnectToMongo(){
 		log.Println("Connected to db successfully")
 		log.Println(client)
 	}
+
+	defer func(){
+		if err = client.Disconnect(context.TODO()); err != nil{
+			log.Println(err)
+		}
+	}()
 }
