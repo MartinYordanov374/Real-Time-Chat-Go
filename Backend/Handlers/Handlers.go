@@ -2,6 +2,11 @@ package HandlerFunctions
 
 import (
 	"github.com/gin-gonic/gin"
+	"RealTimeChatApp/Backend/GlobalVariables"
+	"context"
+	"log"
+	"RealTimeChatApp/Backend/Mongo"
+
 )
 func Login(context *gin.Context){
 	context.JSON(200, gin.H{
@@ -9,8 +14,20 @@ func Login(context *gin.Context){
 	})
 }
 
-func Register(context *gin.Context){
-	context.JSON(200, gin.H{
+func Register(GinContext *gin.Context){
+	collection := GlobalVariables.MongoClient.Database("RTC").Collection("Users")
+
+	newUser := MongoConfig.User{Username: "UserTemplate", HashedPassword: "nothashed", Email: "notmail"}
+
+	res, error := collection.InsertOne(context.TODO(), newUser)
+
+	if error != nil{
+		log.Println(error)
+	}else{
+		log.Println(res.InsertedID)
+	}
+
+	GinContext.JSON(200, gin.H{
 		"message": "This is the registration endpoint placeholder",
 	})
 }

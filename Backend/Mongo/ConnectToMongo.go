@@ -4,10 +4,10 @@ import(
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"log"
-	"context"
+	"RealTimeChatApp/Backend/GlobalVariables"
 )
 
-func ConnectToMongo(){
+func ConnectToMongo() (*mongo.Client, error){
 	uri := "mongodb://mongo:27017/RTC"
 	client, err := mongo.Connect(options.Client().ApplyURI(uri))
 	if err != nil{
@@ -15,11 +15,8 @@ func ConnectToMongo(){
 	}else{
 		log.Println("Connected to db successfully")
 		log.Println(client)
+		GlobalVariables.MongoClient = client
 	}
 
-	defer func(){
-		if err = client.Disconnect(context.TODO()); err != nil{
-			log.Println(err)
-		}
-	}()
+	return client, nil;
 }
