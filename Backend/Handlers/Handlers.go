@@ -6,8 +6,6 @@ import (
 	"context"
 	"log"
 	"RealTimeChatApp/Backend/Mongo"
-	"go.mongodb.org/mongo-driver/v2/bson"
-
 )
 func Login(context *gin.Context){
 	context.JSON(200, gin.H{
