@@ -15,11 +15,9 @@ func Login(context *gin.Context){
 }
 
 func Register(GinContext *gin.Context){
-	collection := GlobalVariables.MongoClient.Database("RTC").Collection("Users")
-
 	newUser := MongoConfig.User{Username: "UserTemplate", HashedPassword: "nothashed", Email: "notmail"}
 
-	res, error := collection.InsertOne(context.TODO(), newUser)
+	res, error := GlobalVariables.MongoCollection.InsertOne(context.TODO(), newUser)
 
 	if error != nil{
 		log.Println(error)

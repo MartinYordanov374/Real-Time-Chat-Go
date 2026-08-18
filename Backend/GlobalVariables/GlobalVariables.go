@@ -5,3 +5,4 @@ import (
 )
 
 var MongoClient *mongo.Client
+var MongoCollection *mongo.Collection

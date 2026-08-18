@@ -13,10 +13,11 @@ func ConnectToMongo() (*mongo.Client, error){
 	if err != nil{
 		log.Println(err)
 	}else{
-		log.Println("Connected to db successfully")
-		log.Println(client)
+		log.Println("Connected to DB successfully!")
 		GlobalVariables.MongoClient = client
-	}
+		collection := GlobalVariables.MongoClient.Database("RTC").Collection("Users")
+		GlobalVariables.MongoCollection = collection
+	 }
 
 	return client, nil;
 }
