@@ -2,6 +2,6 @@ package MongoConfig
 
 type User struct {
 	Username		string		`json:Username`
-	HashedPassword	string		`json:HashedPassword`
+	Password	string		`json:Password`
 	Email			string		`json:Email`
 }

@@ -22,7 +22,7 @@ func Register(GinContext *gin.Context){
 	GinContext.BindJSON(&UserData)
 	GinContext.JSON(200, UserData)
 
-	newUser := MongoConfig.User{Username: UserData.Username, HashedPassword: UserData.HashedPassword, Email: UserData.Email}
+	newUser := MongoConfig.User{Username: UserData.Username, Password: UserData.Password, Email: UserData.Email}
 
 	res, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)
 
@@ -31,4 +31,28 @@ func Register(GinContext *gin.Context){
 	}else{
 		log.Println(res.InsertedID)
 	}
+}
+
+
+func ValidateUsername(Username string){
+	// TODO: Validate username according to the below criteria:
+	// 1. The username does not contain special characters
+	// 2. The username is at least 2 characters long
+	// 3. Trim string input to remove whitespaces
+	// 4. Ensure that no other user is registered with the same username
+}
+
+func ValidatePassword(Password string){
+	// TODO: Validate password according to the following criteria:
+	// 1. The password is at least 15 characters long
+	// 2. It includes at least one upper-case character
+	// 3. It contains at least one special character
+	// 4. Trim to remove whitespace
+	// 5. At least one number
+	// 6. No consecutive repeating characters
+	//
+}
+
+func ValidateEmail(Email string){
+	// TODO: Use an already existing and a battle-proven regex for email verification
 }
