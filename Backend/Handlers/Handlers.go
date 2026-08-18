@@ -48,9 +48,14 @@ func ValidatePassword(Password string){
 	// 4. Trim to remove whitespace
 	// 5. At least one number
 	// 6. No consecutive repeating characters
-	//
 }
 
 func ValidateEmail(Email string){
 	// TODO: Use an already existing and a battle-proven regex for email verification
+}
+
+func HashPassword(Password string) string{
+	// TODO: This function hashes the password only after the validations have passed successfully.
+	HashedPassword := "Placeholder Value"
+	return HashedPassword
 }
