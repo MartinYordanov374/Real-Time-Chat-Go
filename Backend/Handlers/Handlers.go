@@ -21,10 +21,10 @@ func Login(context *gin.Context){
 func Register(GinContext *gin.Context){
 	var UserData MongoConfig.User
 	GinContext.BindJSON(&UserData)
-	GinContext.JSON(200, UserData)
 
 	if UsernameExists(UserData.Username) || EmailExists(UserData.Email){
-		log.Println("This username or email is already taken!")
+			GinContext.JSON(200, gin.H{
+				"message": "This username or email is already taken!"})
 	}else{
 		if ValidateUsername(UserData.Username){
 			if ValidateEmail(UserData.Email){
@@ -34,21 +34,27 @@ func Register(GinContext *gin.Context){
 					newUser := MongoConfig.User{Username: UserData.Username, Password: HashedPassword, Email: UserData.Email}
 					_, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)
 					if error != nil{
-						log.Println(error)
+						GinContext.JSON(200, gin.H{
+							"message": error})
 					}else{
-						log.Println("User registered Successfully")
+						GinContext.JSON(200, gin.H{
+							"message": "User registered Successfully"})
 					}
 				}else{
-					log.Println("Invalid password")
-				}
+					GinContext.JSON(200, gin.H{
+						"message": "Invalid Password"})
+					}
 			}else{
-				log.Println("Invalid email")
-			}
+				GinContext.JSON(200, gin.H{
+					"message": "Invalid email"})
+				}
+
 		}else{
-				log.Println("Invalid Username")
+			GinContext.JSON(200, gin.H{
+					"message": "Invalid Username"})
+			}
 		}
 	}
-}
 
 
 func ValidateUsername(Username string) bool{
@@ -57,8 +63,6 @@ func ValidateUsername(Username string) bool{
 		UsernameRegex, _ := regexp.Compile("^[a-zA-Z]{2,}$")
 
 		ValidUsername := UsernameRegex.MatchString(TrimmedUsername)
-		// TODO: Check if the username is already taken
-
 		if ValidUsername {
 			return true
 		}else{
@@ -95,7 +99,6 @@ func ValidatePassword(Password string) bool{
 }
 
 func ValidateEmail(Email string) bool{
-	// TODO: Use an already existing and a battle-proven regex for email verification
 	TrimmedEmai := strings.TrimSpace(Email)
 	_, err := mail.ParseAddress(TrimmedEmai)
 	if err != nil{
