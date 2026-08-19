@@ -8,6 +8,7 @@ import (
 	"RealTimeChatApp/Backend/Mongo"
 	"regexp"
 	"net/mail"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 func Login(context *gin.Context){
 	context.JSON(200, gin.H{
@@ -16,27 +17,33 @@ func Login(context *gin.Context){
 }
 
 func Register(GinContext *gin.Context){
-	// TODO: Add data validations and sanitization
-	// TODO: Hash the password
 	var UserData MongoConfig.User
 	GinContext.BindJSON(&UserData)
 	GinContext.JSON(200, UserData)
 
-	newUser := MongoConfig.User{Username: UserData.Username, Password: UserData.Password, Email: UserData.Email}
-
-	ValidateUsername(UserData.Username)
-	if ValidateEmail(UserData.Email){
-		log.Println("Valid mail")
+	if UsernameExists(UserData.Username){
+		log.Println("This username is already taken!")
 	}else{
-		log.Println("Invalid mail")
-	}
-
-	res, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)
-
-	if error != nil{
-		log.Println(error)
-	}else{
-		log.Println(res.InsertedID)
+		if ValidateUsername(UserData.Username){
+			if ValidateEmail(UserData.Email){
+				if ValidatePassword(UserData.Password){
+					// TODO: Hash the password
+					newUser := MongoConfig.User{Username: UserData.Username, Password: UserData.Password, Email: UserData.Email}
+					_, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)
+					if error != nil{
+						log.Println(error)
+					}else{
+						log.Println("User registered Successfully")
+					}
+				}else{
+					log.Println("Invalid password")
+				}
+			}else{
+				log.Println("Invalid email")
+			}
+		}else{
+				log.Println("Invalid Username")
+		}
 	}
 }
 
@@ -101,7 +108,17 @@ func HashPassword(Password string) string{
 }
 
 func UsernameExists(Username string) bool{
-	return false
+	var user MongoConfig.User
+	filter := bson.M{"username": Username}
+	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
+
+	if err != nil{
+		log.Println(err)
+		return false
+	}else{
+		return true
+	}
+
 }
 
 func EmailExists(Email string) bool{
