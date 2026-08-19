@@ -34,23 +34,23 @@ func Register(GinContext *gin.Context){
 					newUser := MongoConfig.User{Username: UserData.Username, Password: HashedPassword, Email: UserData.Email}
 					_, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)
 					if error != nil{
-						GinContext.JSON(200, gin.H{
+						GinContext.JSON(500, gin.H{
 							"message": error})
 					}else{
 						GinContext.JSON(200, gin.H{
 							"message": "User registered Successfully"})
 					}
 				}else{
-					GinContext.JSON(200, gin.H{
+					GinContext.JSON(401, gin.H{
 						"message": "Invalid Password"})
 					}
 			}else{
-				GinContext.JSON(200, gin.H{
+				GinContext.JSON(401, gin.H{
 					"message": "Invalid email"})
 				}
 
 		}else{
-			GinContext.JSON(200, gin.H{
+			GinContext.JSON(401, gin.H{
 					"message": "Invalid Username"})
 			}
 		}
