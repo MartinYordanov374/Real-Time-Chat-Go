@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"net/mail"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"golang.org/x/crypto/bcrypt"
 )
 func Login(context *gin.Context){
 	context.JSON(200, gin.H{
@@ -21,14 +22,15 @@ func Register(GinContext *gin.Context){
 	GinContext.BindJSON(&UserData)
 	GinContext.JSON(200, UserData)
 
-	if UsernameExists(UserData.Username){
-		log.Println("This username is already taken!")
+	if UsernameExists(UserData.Username) || EmailExists(UserData.Email){
+		log.Println("This username or email is already taken!")
 	}else{
 		if ValidateUsername(UserData.Username){
 			if ValidateEmail(UserData.Email){
 				if ValidatePassword(UserData.Password){
 					// TODO: Hash the password
-					newUser := MongoConfig.User{Username: UserData.Username, Password: UserData.Password, Email: UserData.Email}
+					HashedPassword := HashPassword(UserData.Password)
+					newUser := MongoConfig.User{Username: UserData.Username, Password: HashedPassword, Email: UserData.Email}
 					_, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)
 					if error != nil{
 						log.Println(error)
@@ -100,11 +102,14 @@ func ValidateEmail(Email string) bool{
 	}
 
 }
-
 func HashPassword(Password string) string{
-	// TODO: This function hashes the password only after the validations have passed successfully.
-	HashedPassword := "Placeholder Value"
-	return HashedPassword
+	// TODO: The password shoihuld be using a cost value from an env file.
+	HashedPassword, err := bcrypt.GenerateFromPassword([]byte(Password), bcrypt.DefaultCost)
+	if err != nil{
+		panic(err)
+	}
+
+	return string(HashedPassword)
 }
 
 func UsernameExists(Username string) bool{
@@ -118,9 +123,19 @@ func UsernameExists(Username string) bool{
 	}else{
 		return true
 	}
-
 }
 
 func EmailExists(Email string) bool{
+	var user MongoConfig.User
+	filter := bson.M{"email": Email}
+	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
+
+	if err != nil{
+		log.Println(err)
+		return false
+	}else{
+		return true
+	}
+
 	return false
 }
