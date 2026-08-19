@@ -10,6 +10,7 @@ import (
 	"net/mail"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"golang.org/x/crypto/bcrypt"
+	"strings"
 )
 func Login(context *gin.Context){
 	context.JSON(200, gin.H{
@@ -51,10 +52,11 @@ func Register(GinContext *gin.Context){
 
 
 func ValidateUsername(Username string) bool{
-	if len(Username) >= 2{
+	TrimmedUsername := strings.TrimSpace(Username)
+	if len(TrimmedUsername) >= 2{
 		UsernameRegex, _ := regexp.Compile("^[a-zA-Z]{2,}$")
 
-		ValidUsername := UsernameRegex.MatchString(Username)
+		ValidUsername := UsernameRegex.MatchString(TrimmedUsername)
 		// TODO: Check if the username is already taken
 
 		if ValidUsername {
@@ -69,16 +71,17 @@ func ValidateUsername(Username string) bool{
 
 func ValidatePassword(Password string) bool{
 	// TODO: Move all regexes to a seperate file
-	if len(Password) >= 15{
+	TrimmedPassword := strings.TrimSpace(Password)
+	if len(TrimmedPassword) >= 15{
 		AtLeastOneLowerCaseRegex:= regexp.MustCompile(`[a-z]`)
 		AtLeastOneUpperCaseRegex:= regexp.MustCompile(`[A-Z]`)
 		AtLeastOneDigitRegex := regexp.MustCompile(`[\\d]`)
 		SpecialRegex := regexp.MustCompile(`[^a-zA-Z0-9]`)
 
-		PasswordContainsLowerCase := AtLeastOneLowerCaseRegex.MatchString(Password)
-		PasswordContainsUpperCase := AtLeastOneUpperCaseRegex.MatchString(Password)
-		PasswordContainsDigit := AtLeastOneDigitRegex.MatchString(Password)
-		PasswordHasSpecialCharacter := SpecialRegex.MatchString(Password)
+		PasswordContainsLowerCase := AtLeastOneLowerCaseRegex.MatchString(TrimmedPassword)
+		PasswordContainsUpperCase := AtLeastOneUpperCaseRegex.MatchString(TrimmedPassword)
+		PasswordContainsDigit := AtLeastOneDigitRegex.MatchString(TrimmedPassword)
+		PasswordHasSpecialCharacter := SpecialRegex.MatchString(TrimmedPassword)
 
 
 		if (PasswordContainsLowerCase && PasswordContainsUpperCase && PasswordContainsDigit && PasswordHasSpecialCharacter){
@@ -93,8 +96,8 @@ func ValidatePassword(Password string) bool{
 
 func ValidateEmail(Email string) bool{
 	// TODO: Use an already existing and a battle-proven regex for email verification
-	//
-	_, err := mail.ParseAddress(Email)
+	TrimmedEmai := strings.TrimSpace(Email)
+	_, err := mail.ParseAddress(TrimmedEmai)
 	if err != nil{
 		return false
 	}else{
@@ -114,7 +117,8 @@ func HashPassword(Password string) string{
 
 func UsernameExists(Username string) bool{
 	var user MongoConfig.User
-	filter := bson.M{"username": Username}
+	TrimmedUsername := strings.TrimSpace(Username)
+	filter := bson.M{"username": TrimmedUsername}
 	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
 
 	if err != nil{
@@ -127,7 +131,8 @@ func UsernameExists(Username string) bool{
 
 func EmailExists(Email string) bool{
 	var user MongoConfig.User
-	filter := bson.M{"email": Email}
+	TrimmedEmail := strings.TrimSpace(Email)
+	filter := bson.M{"email": TrimmedEmail}
 	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
 
 	if err != nil{
