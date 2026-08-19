@@ -12,13 +12,39 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"strings"
 )
-func Login(context *gin.Context){
-	context.JSON(200, gin.H{
-		"message": "This is the logind endpoint placeholder",
-	})
+// TODO: Add more descriptive error messages, i.e., tell what the requirements for a pass and username are.
+func Login(GinContext *gin.Context){
+
+	var UserData MongoConfig.User
+	GinContext.BindJSON(&UserData)
+
+	if ValidateUsername(UserData.Username){
+		if UsernameExists(UserData.Username){
+			var TargetUser MongoConfig.User
+			filter := bson.M{"username":UserData.Username}
+			err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&TargetUser)
+			if err != nil{
+				GinContext.JSON(500, gin.H{"message": "Internal Server Error"})
+				return
+			}
+
+			hashErr := bcrypt.CompareHashAndPassword([]byte(TargetUser.Password), []byte(UserData.Password))
+			if hashErr != nil{
+				GinContext.JSON(401, gin.H{"message": "Wrong Password"})
+			}else{
+				GinContext.JSON(200, gin.H{"message": "Login Successful"})
+			}
+		}else{
+				GinContext.JSON(404, gin.H{"message": "Such a user does not exist!"})
+		}
+	}else{
+		GinContext.JSON(401, gin.H{"message": "This username does not meet the username requirements."})
+
+	}
 }
 
 func Register(GinContext *gin.Context){
+	// TODO: If the username is unique, then conbsider removing the email field
 	var UserData MongoConfig.User
 	GinContext.BindJSON(&UserData)
 
@@ -119,6 +145,7 @@ func HashPassword(Password string) string{
 }
 
 func UsernameExists(Username string) bool{
+	// TODO: Rename to UserExists
 	var user MongoConfig.User
 	TrimmedUsername := strings.TrimSpace(Username)
 	filter := bson.M{"username": TrimmedUsername}
