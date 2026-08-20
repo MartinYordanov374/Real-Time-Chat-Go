@@ -11,7 +11,6 @@ import (
  	"RealTimeChatApp/Backend/Redis"
 	"RealTimeChatApp/Backend/HelperFunctions"
 	"github.com/google/uuid"
-	"time"
 	"encoding/json"
 )
 
@@ -40,7 +39,7 @@ func Login(GinContext *gin.Context){
 				if SessionError != nil{
 					log.Println(SessionError)
 				}
-				err := Redis.Client.Set(context.TODO(), SessionID, SessionData, 1*time.Minute).Err()
+				err := Redis.Client.Set(context.TODO(), SessionID, SessionData, GlobalVariables.SessionDuration).Err()
 				if err != nil{
 					log.Println(err)
 				}
@@ -70,7 +69,6 @@ func Register(GinContext *gin.Context){
 		if HelperFunctions.ValidateUsername(UserData.Username){
 			if HelperFunctions.ValidateEmail(UserData.Email){
 				if HelperFunctions.ValidatePassword(UserData.Password){
-					// TODO: Hash the password
 					HashedPassword := HelperFunctions.HashPassword(UserData.Password)
 					newUser := MongoConfig.User{Username: UserData.Username, Password: HashedPassword, Email: UserData.Email}
 					_, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)

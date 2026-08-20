@@ -1,10 +1,10 @@
 package MongoConfig
 
 import(
-	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"log"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 	"RealTimeChatApp/Backend/GlobalVariables"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 func ConnectToMongo() (*mongo.Client, error){

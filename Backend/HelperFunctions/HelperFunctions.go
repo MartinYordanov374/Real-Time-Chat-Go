@@ -15,7 +15,7 @@ import(
 
 func SetSessionCookie(GinContext *gin.Context, SessionID string){
 	// TODO: Make the cookie last as long as the session, i.e., create a global variable for this
-	GinContext.SetCookie("SessionID", SessionID, 60, "/", "localhost", false, false)
+	GinContext.SetCookie("SessionID", SessionID, GlobalVariables.CookieExpirationSeconds, "/", "localhost", false, false)
 }
 
 func ValidateUsername(Username string) bool{

@@ -1,10 +1,10 @@
 package Middlewares
 
 import (
-	"github.com/gin-gonic/gin"
-	"net/http"
-	"RealTimeChatApp/Backend/Redis"
 	"context"
+	"net/http"
+	"github.com/gin-gonic/gin"
+	"RealTimeChatApp/Backend/Redis"
 )
 func AuthMiddleware(GinContext *gin.Context) bool{
 	SessionCookie, err := GinContext.Cookie("SessionID")
