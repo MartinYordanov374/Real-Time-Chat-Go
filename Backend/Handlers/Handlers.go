@@ -15,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	"time"
 	"encoding/json"
+	"net/http"
 )
 
 // TODO: Add more descriptive error messages, i.e., tell what the requirements for a pass and username are.
@@ -37,8 +38,6 @@ func Login(GinContext *gin.Context){
 			if hashErr != nil{
 				GinContext.JSON(401, gin.H{"message": "Wrong Password"})
 			}else{
-				GinContext.JSON(200, gin.H{"message": "Login Successful"})
-				// TODO: Create a server-side session upon successful login
 				SessionID := uuid.New().String()
 				SessionData, SessionError := json.Marshal(Redis.Session{SessionID: SessionID, UserID:TargetUser.ID})
 				if SessionError != nil{
@@ -49,7 +48,9 @@ func Login(GinContext *gin.Context){
 					log.Println(err)
 				}
 
-				log.Println(SessionID)
+				SetSessionCookie(GinContext, SessionID)
+				GinContext.JSON(200, gin.H{"message": "Login Successful"})
+
 			}
 		}else{
 				GinContext.JSON(404, gin.H{"message": "Such a user does not exist!"})
@@ -106,15 +107,25 @@ func TestSession(GinContext *gin.Context){
 	// 3. Fix the error handling
 	// 4. Instead of fetching the SessionID from the body, take it from the user cookie
 	// 5. Get rid of the Test struct in Mongo once done with the testing`
-	var Request MongoConfig.Test;
-	GinContext.BindJSON(&Request)
-
-	Result := Redis.Client.Get(context.TODO(), Request.SessionID)
-	if Result != nil{
-		log.Println(Result)
-	}else{
-		log.Println("This Session DOes not exist")
+	SessionCookie, err := GinContext.Cookie("SessionID")
+	if err != nil{
+		GinContext.String(http.StatusNotFound, "Cookie missing")
+		return
 	}
+
+	log.Println(SessionCookie)
+	_, RedisResultError := Redis.Client.Get(context.TODO(), SessionCookie).Result()
+	if RedisResultError != nil{
+		GinContext.String(http.StatusNotFound, "This session does not exist in redis")
+
+	}else{
+		GinContext.String(http.StatusOK, "This session exists in redis")
+	}
+}
+
+func SetSessionCookie(GinContext *gin.Context, SessionID string){
+	// TODO: Make the cookie last as long as the session, i.e., create a global variable for this
+	GinContext.SetCookie("SessionID", SessionID, 60, "/", "localhost", false, false)
 }
 
 
