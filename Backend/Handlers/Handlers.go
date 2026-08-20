@@ -6,16 +6,13 @@ import (
 	"context"
 	"log"
 	"RealTimeChatApp/Backend/Mongo"
-	"regexp"
-	"net/mail"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"golang.org/x/crypto/bcrypt"
-	"strings"
-	"RealTimeChatApp/Backend/Redis"
+ 	"RealTimeChatApp/Backend/Redis"
+	"RealTimeChatApp/Backend/HelperFunctions"
 	"github.com/google/uuid"
 	"time"
 	"encoding/json"
-	"net/http"
 )
 
 // TODO: Add more descriptive error messages, i.e., tell what the requirements for a pass and username are.
@@ -24,8 +21,8 @@ func Login(GinContext *gin.Context){
 	var UserData MongoConfig.User
 	GinContext.BindJSON(&UserData)
 
-	if ValidateUsername(UserData.Username){
-		if UsernameExists(UserData.Username){
+	if HelperFunctions.ValidateUsername(UserData.Username){
+		if HelperFunctions.UsernameExists(UserData.Username){
 			var TargetUser MongoConfig.User
 			filter := bson.M{"username":UserData.Username}
 			err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&TargetUser)
@@ -48,7 +45,7 @@ func Login(GinContext *gin.Context){
 					log.Println(err)
 				}
 
-				SetSessionCookie(GinContext, SessionID)
+				HelperFunctions.SetSessionCookie(GinContext, SessionID)
 				GinContext.JSON(200, gin.H{"message": "Login Successful"})
 
 			}
@@ -66,15 +63,15 @@ func Register(GinContext *gin.Context){
 	var UserData MongoConfig.User
 	GinContext.BindJSON(&UserData)
 
-	if UsernameExists(UserData.Username) || EmailExists(UserData.Email){
+	if HelperFunctions.UsernameExists(UserData.Username) || HelperFunctions.EmailExists(UserData.Email){
 			GinContext.JSON(200, gin.H{
 				"message": "This username or email is already taken!"})
 	}else{
-		if ValidateUsername(UserData.Username){
-			if ValidateEmail(UserData.Email){
-				if ValidatePassword(UserData.Password){
+		if HelperFunctions.ValidateUsername(UserData.Username){
+			if HelperFunctions.ValidateEmail(UserData.Email){
+				if HelperFunctions.ValidatePassword(UserData.Password){
 					// TODO: Hash the password
-					HashedPassword := HashPassword(UserData.Password)
+					HashedPassword := HelperFunctions.HashPassword(UserData.Password)
 					newUser := MongoConfig.User{Username: UserData.Username, Password: HashedPassword, Email: UserData.Email}
 					_, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)
 					if error != nil{
@@ -98,119 +95,4 @@ func Register(GinContext *gin.Context){
 					"message": "Invalid Username"})
 			}
 		}
-}
-
-func AuthMiddleware(GinContext *gin.Context) bool{
-	SessionCookie, err := GinContext.Cookie("SessionID")
-	if err != nil{
-		GinContext.String(http.StatusNotFound, "Cookie missing")
-		return false
-	}
-	_, RedisResultError := Redis.Client.Get(context.TODO(), SessionCookie).Result()
-	if RedisResultError != nil{
-		GinContext.String(http.StatusNotFound, "This session does not exist in redis")
-		return false
-
-	}else{
-		GinContext.String(http.StatusOK, "This session exists in redis")
-		return true
-	}
-}
-
-func SetSessionCookie(GinContext *gin.Context, SessionID string){
-	// TODO: Make the cookie last as long as the session, i.e., create a global variable for this
-	GinContext.SetCookie("SessionID", SessionID, 60, "/", "localhost", false, false)
-}
-
-
-func ValidateUsername(Username string) bool{
-	TrimmedUsername := strings.TrimSpace(Username)
-	if len(TrimmedUsername) >= 2{
-		UsernameRegex, _ := regexp.Compile("^[a-zA-Z]{2,}$")
-
-		ValidUsername := UsernameRegex.MatchString(TrimmedUsername)
-		if ValidUsername {
-			return true
-		}else{
-			return false
-		}
-	}else{
-		return false
-	}
-}
-
-func ValidatePassword(Password string) bool{
-	// TODO: Move all regexes to a seperate file
-	TrimmedPassword := strings.TrimSpace(Password)
-	if len(TrimmedPassword) >= 15{
-		AtLeastOneLowerCaseRegex:= regexp.MustCompile(`[a-z]`)
-		AtLeastOneUpperCaseRegex:= regexp.MustCompile(`[A-Z]`)
-		AtLeastOneDigitRegex := regexp.MustCompile(`[\\d]`)
-		SpecialRegex := regexp.MustCompile(`[^a-zA-Z0-9]`)
-
-		PasswordContainsLowerCase := AtLeastOneLowerCaseRegex.MatchString(TrimmedPassword)
-		PasswordContainsUpperCase := AtLeastOneUpperCaseRegex.MatchString(TrimmedPassword)
-		PasswordContainsDigit := AtLeastOneDigitRegex.MatchString(TrimmedPassword)
-		PasswordHasSpecialCharacter := SpecialRegex.MatchString(TrimmedPassword)
-
-
-		if (PasswordContainsLowerCase && PasswordContainsUpperCase && PasswordContainsDigit && PasswordHasSpecialCharacter){
-			return true
-		}else{
-			return false
-		}
-	}else{
-		return false
-	}
-}
-
-func ValidateEmail(Email string) bool{
-	TrimmedEmai := strings.TrimSpace(Email)
-	_, err := mail.ParseAddress(TrimmedEmai)
-	if err != nil{
-		return false
-	}else{
-		return true
-	}
-
-}
-func HashPassword(Password string) string{
-	// TODO: The password shoihuld be using a cost value from an env file.
-	HashedPassword, err := bcrypt.GenerateFromPassword([]byte(Password), bcrypt.DefaultCost)
-	if err != nil{
-		panic(err)
-	}
-
-	return string(HashedPassword)
-}
-
-func UsernameExists(Username string) bool{
-	// TODO: Rename to UserExists
-	var user MongoConfig.User
-	TrimmedUsername := strings.TrimSpace(Username)
-	filter := bson.M{"username": TrimmedUsername}
-	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
-
-	if err != nil{
-		log.Println(err)
-		return false
-	}else{
-		return true
-	}
-}
-
-func EmailExists(Email string) bool{
-	var user MongoConfig.User
-	TrimmedEmail := strings.TrimSpace(Email)
-	filter := bson.M{"email": TrimmedEmail}
-	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
-
-	if err != nil{
-		log.Println(err)
-		return false
-	}else{
-		return true
-	}
-
-	return false
 }
