@@ -6,7 +6,7 @@ import (
 
 
 // TODO: Replace the values below with .ENV values
-var RedisClient = redis.NewClient(&redis.Options{
+var Client = redis.NewClient(&redis.Options{
 	Addr: "redis:6379",
 	Password: "",
 	DB: 0,
