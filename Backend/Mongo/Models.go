@@ -7,7 +7,3 @@ type User struct {
 	Password	string		`json:"Password"`
 	Email			string		`json:"Email"`
 }
-
-type Test struct{
-	SessionID string
-}

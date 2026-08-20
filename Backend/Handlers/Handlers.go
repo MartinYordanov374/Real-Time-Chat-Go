@@ -104,9 +104,6 @@ func TestSession(GinContext *gin.Context){
 	// TODO:
 	// 1. Rename this to AuthMiddleware
 	// 2. Use this function as a middleware for the planned endpoints
-	// 3. Fix the error handling
-	// 4. Instead of fetching the SessionID from the body, take it from the user cookie
-	// 5. Get rid of the Test struct in Mongo once done with the testing`
 	SessionCookie, err := GinContext.Cookie("SessionID")
 	if err != nil{
 		GinContext.String(http.StatusNotFound, "Cookie missing")
