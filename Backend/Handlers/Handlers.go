@@ -100,23 +100,20 @@ func Register(GinContext *gin.Context){
 		}
 }
 
-func TestSession(GinContext *gin.Context){
-	// TODO:
-	// 1. Rename this to AuthMiddleware
-	// 2. Use this function as a middleware for the planned endpoints
+func AuthMiddleware(GinContext *gin.Context) bool{
 	SessionCookie, err := GinContext.Cookie("SessionID")
 	if err != nil{
 		GinContext.String(http.StatusNotFound, "Cookie missing")
-		return
+		return false
 	}
-
-	log.Println(SessionCookie)
 	_, RedisResultError := Redis.Client.Get(context.TODO(), SessionCookie).Result()
 	if RedisResultError != nil{
 		GinContext.String(http.StatusNotFound, "This session does not exist in redis")
+		return false
 
 	}else{
 		GinContext.String(http.StatusOK, "This session exists in redis")
+		return true
 	}
 }
 

@@ -16,7 +16,5 @@ func main(){
 
 	router.POST("/register", HandlerFunctions.Register)
 
-	router.GET("/test", HandlerFunctions.TestSession)
-
 	router.Run()
 }
