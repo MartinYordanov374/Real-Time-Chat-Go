@@ -12,6 +12,9 @@ func main(){
 
 	router := gin.Default()
 
+	// TODO: Make the login and register endpoints unavailable for logged registers
+	// TODO: Create a logout endpoint
+
 	router.POST("/login", HandlerFunctions.Login)
 
 	router.POST("/register", HandlerFunctions.Register)
