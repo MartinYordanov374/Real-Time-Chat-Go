@@ -95,11 +95,6 @@ func Register(GinContext *gin.Context){
 		}
 }
 
-
-func Test(GinContext *gin.Context){
-	GinContext.JSON(200, gin.H{"message": "Success"})
-}
-
 // TODO: The below functions are accessible to logged in users only
 // TODO: Take care of authorization also
 // TODO: Each sent message that is not read by the receiver shall land in the inbox

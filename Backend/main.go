@@ -24,7 +24,7 @@ func main(){
 	router.GET("/RetrieveChat/:ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.RetrieveChat)
 	router.POST("/RespondToRequest/:RequestID", Middlewares.AuthMiddleware(), HandlerFunctions.RespondToChatRequest)
 	router.POST("/SendMessage/:ReceiverID", Middlewares.AuthMiddleware(), HandlerFunctions.SendMessage)
-	router.POST("/InviteUserToGroupChat/:UserID/:/ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.InviteUserToGroupChat)
+	router.POST("/InviteUserToGroupChat/:UserID/:ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.InviteUserToGroupChat)
 
 
 	router.Run()
