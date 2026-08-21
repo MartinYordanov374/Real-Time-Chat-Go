@@ -19,7 +19,13 @@ func main(){
 
 	router.POST("/register", HandlerFunctions.Register)
 
-	router.GET("/test", Middlewares.AuthMiddleware(), HandlerFunctions.Test)
+	router.POST("/logout", Middlewares.AuthMiddleware(), HandlerFunctions.Logout)
+
+	router.GET("/RetrieveChat/:ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.RetrieveChat)
+	router.POST("/RespondToRequest/:RequestID", Middlewares.AuthMiddleware(), HandlerFunctions.RespondToChatRequest)
+	router.POST("/SendMessage/:ReceiverID", Middlewares.AuthMiddleware(), HandlerFunctions.SendMessage)
+	router.POST("/InviteUserToGroupChat/:UserID/:/ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.InviteUserToGroupChat)
+
 
 	router.Run()
 }
