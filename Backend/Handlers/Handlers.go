@@ -94,3 +94,8 @@ func Register(GinContext *gin.Context){
 			}
 		}
 }
+
+
+func Test(GinContext *gin.Context){
+	GinContext.JSON(200, gin.H{"message": "Success"})
+}

@@ -6,19 +6,21 @@ import (
 	"github.com/gin-gonic/gin"
 	"RealTimeChatApp/Backend/Redis"
 )
-func AuthMiddleware(GinContext *gin.Context) bool{
-	SessionCookie, err := GinContext.Cookie("SessionID")
-	if err != nil{
-		GinContext.String(http.StatusNotFound, "Cookie missing")
-		return false
-	}
-	_, RedisResultError := Redis.Client.Get(context.TODO(), SessionCookie).Result()
-	if RedisResultError != nil{
-		GinContext.String(http.StatusNotFound, "This session does not exist in redis")
-		return false
+func AuthMiddleware() gin.HandlerFunc{
+	return func(GinContext *gin.Context){
+		SessionCookie, err := GinContext.Cookie("SessionID")
+		if err != nil{
+			GinContext.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message":"Cookie Missing"})
+			return
+		}
+		_, RedisResultError := Redis.Client.Get(context.TODO(), SessionCookie).Result()
+		if RedisResultError != nil{
+			GinContext.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message":"This session does not exist in redis"})
+			return
 
-	}else{
-		GinContext.String(http.StatusOK, "This session exists in redis")
-		return true
+		}else{
+			GinContext.Next()
+			GinContext.String(http.StatusOK, "This session exists in redis")
+		}
 	}
 }
