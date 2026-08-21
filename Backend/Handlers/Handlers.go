@@ -99,3 +99,41 @@ func Register(GinContext *gin.Context){
 func Test(GinContext *gin.Context){
 	GinContext.JSON(200, gin.H{"message": "Success"})
 }
+
+// TODO: The below functions are accessible to logged in users only
+// TODO: Take care of authorization also
+// TODO: Each sent message that is not read by the receiver shall land in the inbox
+// TODO: The inbox shall also include history and the received chat requests
+func SendMessage(GinContext *gin.Context){
+	// TODO: Follow the steps below
+	// 1. Get the sender's data via the session cookie
+	// 2. Validate whether the receiver user exists
+	// 3. Validate whether a chat between the sender and the receiver exists, if not send a request to the receiver
+	// 3.1. Send the sender message regardless of whether the receiver accepts the chat invitation or not
+	// 3.2. If the receiver rejects the invitation, delete the conversation along with the messages.
+
+	// TODO: Create a CreateConversation helper function
+}
+
+
+func RespondToChatRequest(GinContext *gin.Context){
+	// TODO: This function shall handle a user's response to a request
+	// 1. If the request is rejected, delete all conversation and correspondingb messages with the sender
+	// 2. If the request is approved, the chat remains and the sender can send more messages than just one.
+}
+
+func Logout(GinContext *gin.Context){
+	// TODO: This function deleted the session cookie and removes the session from the Redis session storage
+}
+
+
+func InviteUserToGroupChat(GinContext *gin.Context){
+	// TODO: This function shall invite a user to join an already existing chat between two or more users.
+	// 1. Validate that the receiver user exists
+	// 2. Send them a request and wait for their response
+}
+
+func RetrieveChat(GinContext *gin.Context){
+	// TODO: This function shall fetch the chat between the requesting user and the specified user.
+	// TODO: Retrieve the most recent, i.e., 50 or 100 messages from the chat from Redis if available
+}
