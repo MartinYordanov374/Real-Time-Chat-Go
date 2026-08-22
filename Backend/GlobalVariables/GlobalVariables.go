@@ -7,5 +7,6 @@ import (
 
 var MongoClient *mongo.Client
 var MongoUsersCollection *mongo.Collection
+var MongoChatsCollection *mongo.Collection
 var SessionDuration = 1*time.Hour
 var CookieExpirationSeconds = 3600

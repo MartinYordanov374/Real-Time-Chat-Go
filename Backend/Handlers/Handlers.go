@@ -132,6 +132,13 @@ func SendMessage(GinContext *gin.Context){
 			}else{
 				if HelperFunctions.UserExistsByID(ConvertedReceiverID){
 					log.Println("The receiver user exists")
+					if HelperFunctions.ChatExistsBetweenUsers(SenderID, ConvertedReceiverID){
+						// TODO: Create message object with the chat ID
+					}else{
+						// TODO: Create chat between the users and a sender message ID to this chat
+						// TODO: Create a request object from sender to reciever
+						// NOTE: No more messages can be sent until the receiver accepts the request
+					}
 				}else{
 					log.Println("The receiver user does not exist")
 					return

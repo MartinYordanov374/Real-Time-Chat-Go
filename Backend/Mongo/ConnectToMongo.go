@@ -16,7 +16,11 @@ func ConnectToMongo() (*mongo.Client, error){
 		log.Println("Connected to DB successfully!")
 		GlobalVariables.MongoClient = client
 		UsersCollection := GlobalVariables.MongoClient.Database("RTC").Collection("Users")
+		ChatsCollection := GlobalVariables.MongoClient.Database("RTC").Collection("Chats")
+
 		GlobalVariables.MongoUsersCollection = UsersCollection
+		GlobalVariables.MongoChatsCollection = ChatsCollection
+
 	 }
 
 	return client, nil;

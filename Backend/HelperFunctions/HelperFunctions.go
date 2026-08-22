@@ -117,7 +117,24 @@ func UserExistsByID(UserID bson.ObjectID) bool{
 	if err != nil {
 		return false
 	}else{
-		log.Println(user)
 		return true
 	}
 }
+
+// TODO: Move Chat functions to a seperate file
+func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool{
+	var chat MongoConfig.Chat
+	filter := bson.M{"CreatorID": SenderID, "Participants": ReceiverID}
+	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&chat)
+
+	if err != nil {
+		log.Println("Chat between those users does not exist, creating chat...")
+		return false
+	}else{
+		log.Println("The chat between those users exists, sending message...")
+		return true
+	}
+
+}
+
+func CreateChat
