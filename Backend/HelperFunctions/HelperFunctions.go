@@ -142,7 +142,7 @@ func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID){
 	newChat := MongoConfig.Chat{
 		Messages: []bson.ObjectID{},
 		CreatorID: CreatorID,
-		Participants: []bson.ObjectID{CreatorID, ReceiverID},
+		ReceiverID: ReceiverID,
 		CreationDate: time.Now()}
 
 	_, err := GlobalVariables.MongoChatsCollection.InsertOne(context.TODO(), newChat)
@@ -152,5 +152,24 @@ func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID){
 	}else{
 		log.Println("Successfully created chat between the users")
 	}
+}
 
+func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content string){
+	newMessage := MongoConfig.Message{
+		ChatID: ChatID,
+		TextContent: Content,
+		TimeStamp: time.Now(),
+		SenderID: SenderID,
+	}
+
+	_, err := GlobalVariables.MongoMessagesCollection.InsertOne(context.TODO(), newMessage)
+	if err != nil{
+		log.Println(err)
+	}else{
+		log.Println("Message sent")
+	}
+}
+
+func RetrieveChatID(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) bson.ObjectID{
+	return bson.NilObjectID
 }

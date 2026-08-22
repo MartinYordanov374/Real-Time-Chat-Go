@@ -14,7 +14,7 @@ type Chat struct {
 	ID           bson.ObjectID   `json:"id" bson:"_id,omitempty"`
 	Messages     []bson.ObjectID `json:"messages" bson:"messages"`
 	CreatorID    bson.ObjectID   `json:"creatorId" bson:"creator_id"`
-	Participants []bson.ObjectID `json:"participants" bson:"participants"`
+	ReceiverID bson.ObjectID `json:"receiverId" bson:"receiver_id"`
 	CreationDate time.Time       `json:"creationDate" bson:"creation_date"`
 }
 
@@ -23,6 +23,7 @@ type Message struct {
 	ChatID      bson.ObjectID `json:"chatId" bson:"chat_id"`
 	TextContent string        `json:"textContent" bson:"text_content"`
 	TimeStamp   time.Time     `json:"timeStamp" bson:"time_stamp"`
+	SenderID	bson.ObjectID `json:"senderId" bson:"sender_id"`
 }
 
 type Request struct {

@@ -122,9 +122,7 @@ func SendMessage(GinContext *gin.Context){
 			}
 
 			SenderID := SessionData.UserID
-			log.Println("Sender: ", SenderID)
 			ReceiverID := GinContext.Param("ReceiverID")
-			log.Println("Receiver: ", ReceiverID)
 			ConvertedReceiverID, err := bson.ObjectIDFromHex(ReceiverID)
 			if err != nil {
 				log.Println(err)
@@ -138,8 +136,7 @@ func SendMessage(GinContext *gin.Context){
 						// TODO: Create chat between the users and a sender message ID to this chat
 						// TODO: Create a request object from sender to reciever
 						// NOTE: No more messages can be sent until the receiver accepts the request
-						HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
-
+						ChatID := HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
 					}
 				}else{
 					log.Println("The receiver user does not exist")

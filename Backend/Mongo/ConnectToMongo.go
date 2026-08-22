@@ -17,10 +17,10 @@ func ConnectToMongo() (*mongo.Client, error){
 		GlobalVariables.MongoClient = client
 		UsersCollection := GlobalVariables.MongoClient.Database("RTC").Collection("Users")
 		ChatsCollection := GlobalVariables.MongoClient.Database("RTC").Collection("Chats")
-
+		MessagesCollection := GlobalVariables.MongoClient.Database("RTC").Collection("Messages")
 		GlobalVariables.MongoUsersCollection = UsersCollection
 		GlobalVariables.MongoChatsCollection = ChatsCollection
-
+		GlobalVariables.MongoMessagesCollection = MessagesCollection
 	 }
 
 	return client, nil;
