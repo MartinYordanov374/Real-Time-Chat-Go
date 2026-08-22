@@ -182,3 +182,15 @@ func RetrieveChatID(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) bson.Obje
 		return TargetChat.ID
 	}
 }
+
+func ChatRequestSent(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool{
+	return false
+}
+
+func SendChatRequest(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool{
+	return false
+}
+
+func IsChatRequestAccepted(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool{
+	return false
+}
