@@ -30,7 +30,7 @@ type Request struct {
 	ID         bson.ObjectID `json:"id" bson:"_id,omitempty"`
 	SenderID   bson.ObjectID `json:"senderId" bson:"sender_id"`
 	ReceiverID bson.ObjectID `json:"receiverId" bson:"receiver_id"`
-	Status     bool           `json:"requestStatus" bson:"request_status"`
+	Status     RequestStatus           `json:"requestStatus" bson:"request_status"`
 	TimeStamp  time.Time      `json:"timeStamp" bson:"time_stamp"`
 }
 
