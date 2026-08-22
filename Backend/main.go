@@ -5,7 +5,9 @@ import(
 	"RealTimeChatApp/Backend/Handlers"
 	"RealTimeChatApp/Backend/Mongo"
 	"RealTimeChatApp/Backend/Middlewares"
+	"RealTimeChatApp/Backend/WebSockets"
 )
+
 func main(){
 
 	MongoConfig.ConnectToMongo()
@@ -26,6 +28,6 @@ func main(){
 	router.POST("/SendMessage/:ReceiverID", Middlewares.AuthMiddleware(), HandlerFunctions.SendMessage)
 	router.POST("/InviteUserToGroupChat/:UserID/:ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.InviteUserToGroupChat)
 
-
+	router.GET("/ws", WebSockets.HandleWebSocketConnection)
 	router.Run()
 }
