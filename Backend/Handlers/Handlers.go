@@ -141,12 +141,15 @@ func SendMessage(GinContext *gin.Context){
 						CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
 						HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
 					}else{
-						if HelperFunctions.IsChatRequestAccepted(SenderID, ConvertedReceiverID){
+						RequestStatus := HelperFunctions.GetChatRequestStatus(SenderID, ConvertedReceiverID)
+						if RequestStatus == MongoConfig.RequestAccepted{
 							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
 							HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
 
-						}else{
+						}else if RequestStatus == MongoConfig.RequestPending{
 							log.Println("The request hasn't been answered yet. You can only send one message before a request is approved.")
+						}else{
+							log.Println("In any other case the conversation is deleted")
 						}
 					}
 				}else{

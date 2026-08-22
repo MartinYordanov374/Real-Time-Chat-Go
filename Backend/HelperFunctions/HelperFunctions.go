@@ -184,13 +184,49 @@ func RetrieveChatID(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) bson.Obje
 }
 
 func ChatRequestSent(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool{
-	return false
+	// TODO: Check if the request object exists
+	filter := bson.M{"sender_id": SenderID, "receiver_id": ReceiverID}
+	var TargetRequest MongoConfig.Request;
+	err := GlobalVariables.MongoRequestsCollection.FindOne(context.TODO(), filter).Decode(&TargetRequest)
+	if err != nil {
+		log.Println(err)
+		return false
+	}else{
+		log.Println(TargetRequest)
+		return true
+	}
 }
 
-func SendChatRequest(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool{
-	return false
+func SendChatRequest(SenderID bson.ObjectID, ReceiverID bson.ObjectID){
+	// TODO: Create Request Object
+	if !ChatRequestSent(SenderID, ReceiverID){
+		NewRequest := MongoConfig.Request{
+			SenderID : SenderID,
+			ReceiverID: ReceiverID,
+			Status: MongoConfig.RequestPending,
+			TimeStamp: time.Now(),
+		}
+		_, err := GlobalVariables.MongoRequestsCollection.InsertOne(context.TODO(), NewRequest)
+		if err != nil{
+			log.Println(err)
+		}else{
+			log.Println("Connection Request sent!")
+		}
+	}else{
+		log.Println("You have already sent this user a message request!")
+	}
 }
 
-func IsChatRequestAccepted(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool{
-	return false
+
+func GetChatRequestStatus(SenderID bson.ObjectID, ReceiverID bson.ObjectID) MongoConfig.RequestStatus {
+
+	filter := bson.M{"sender_id": SenderID, "receiver_id": ReceiverID}
+	var TargetRequest MongoConfig.Request;
+
+	err := GlobalVariables.MongoRequestsCollection.FindOne(context.TODO(), filter).Decode(&TargetRequest)
+	if err != nil {
+		log.Println(err)
+		return MongoConfig.RequestError
+	}
+	return TargetRequest.Status
 }
