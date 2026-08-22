@@ -109,3 +109,15 @@ func EmailExists(Email string) bool{
 
 	return false
 }
+
+func UserExistsByID(UserID bson.ObjectID) bool{
+	var user MongoConfig.User
+	filter := bson.M{"_id": UserID}
+	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		return false
+	}else{
+		log.Println(user)
+		return true
+	}
+}
