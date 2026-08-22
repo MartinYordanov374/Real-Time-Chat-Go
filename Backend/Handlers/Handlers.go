@@ -103,6 +103,8 @@ func SendMessage(GinContext *gin.Context){
 	// TODO: Follow the steps below
 	// 1. Get the sender's data via the session cookie
 	SessionCookie, err := GinContext.Cookie("SessionID")
+	var RequestBody MongoConfig.Message;
+	GinContext.BindJSON(&RequestBody)
 
 	if err != nil{
 		log.Println(err)
@@ -132,11 +134,17 @@ func SendMessage(GinContext *gin.Context){
 					log.Println("The receiver user exists")
 					if HelperFunctions.ChatExistsBetweenUsers(SenderID, ConvertedReceiverID){
 						// TODO: Create message object with the chat ID
+						CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
+						HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
+
 					}else{
 						// TODO: Create chat between the users and a sender message ID to this chat
 						// TODO: Create a request object from sender to reciever
 						// NOTE: No more messages can be sent until the receiver accepts the request
-						ChatID := HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
+						HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
+						CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
+						log.Println(CurrentChatID)
+						HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
 					}
 				}else{
 					log.Println("The receiver user does not exist")

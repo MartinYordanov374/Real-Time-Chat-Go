@@ -125,7 +125,7 @@ func UserExistsByID(UserID bson.ObjectID) bool{
 // TODO: Move Chat functions to a seperate file
 func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool{
 	var chat MongoConfig.Chat
-	filter := bson.M{"SenderID": SenderID, "Participants": ReceiverID}
+	filter := bson.M{"creator_id": SenderID, "receiver_id": ReceiverID}
 	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&chat)
 
 	if err != nil {
@@ -166,10 +166,19 @@ func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content s
 	if err != nil{
 		log.Println(err)
 	}else{
-		log.Println("Message sent")
+		log.Println("Message object created")
 	}
 }
 
 func RetrieveChatID(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) bson.ObjectID{
-	return bson.NilObjectID
+	// TODO: Make those filters bi-directional
+	var TargetChat MongoConfig.Chat;
+	filter := bson.M{"creator_id": CreatorID, "receiver_id": ReceiverID}
+	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&TargetChat)
+	if err != nil{
+		log.Println(err)
+		return bson.NilObjectID
+	}else{
+		return TargetChat.ID
+	}
 }
