@@ -11,6 +11,7 @@ import(
 	"log"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"time"
 )
 
 func SetSessionCookie(GinContext *gin.Context, SessionID string){
@@ -124,7 +125,7 @@ func UserExistsByID(UserID bson.ObjectID) bool{
 // TODO: Move Chat functions to a seperate file
 func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool{
 	var chat MongoConfig.Chat
-	filter := bson.M{"CreatorID": SenderID, "Participants": ReceiverID}
+	filter := bson.M{"SenderID": SenderID, "Participants": ReceiverID}
 	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&chat)
 
 	if err != nil {
@@ -137,4 +138,19 @@ func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bo
 
 }
 
-func CreateChat
+func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID){
+	newChat := MongoConfig.Chat{
+		Messages: []bson.ObjectID{},
+		CreatorID: CreatorID,
+		Participants: []bson.ObjectID{CreatorID, ReceiverID},
+		CreationDate: time.Now()}
+
+	_, err := GlobalVariables.MongoChatsCollection.InsertOne(context.TODO(), newChat)
+
+	if err != nil {
+		log.Println(err)
+	}else{
+		log.Println("Successfully created chat between the users")
+	}
+
+}

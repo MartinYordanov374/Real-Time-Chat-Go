@@ -138,6 +138,8 @@ func SendMessage(GinContext *gin.Context){
 						// TODO: Create chat between the users and a sender message ID to this chat
 						// TODO: Create a request object from sender to reciever
 						// NOTE: No more messages can be sent until the receiver accepts the request
+						HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
+
 					}
 				}else{
 					log.Println("The receiver user does not exist")
