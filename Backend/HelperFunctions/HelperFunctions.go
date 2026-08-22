@@ -156,6 +156,7 @@ func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID){
 
 func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content string){
 	newMessage := MongoConfig.Message{
+		ID: bson.NewObjectID(),
 		ChatID: ChatID,
 		TextContent: Content,
 		TimeStamp: time.Now(),
@@ -167,6 +168,29 @@ func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content s
 		log.Println(err)
 	}else{
 		log.Println("Message object created")
+		AddMessageToChat(newMessage, ChatID)
+	}
+}
+
+func AddMessageToChat(Message MongoConfig.Message, ChatID bson.ObjectID){
+	var TargetChat MongoConfig.Chat;
+	filter := bson.M{"_id": ChatID}
+	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&TargetChat)
+	if err != nil{
+		log.Println(err)
+	}else{
+		UpdateQuery := bson.M{
+			"$push": bson.M{
+				"messages": Message.ID,
+			},
+		}
+
+		_, UpdateError := GlobalVariables.MongoChatsCollection.UpdateOne(context.TODO(), filter, UpdateQuery)
+		if UpdateError != nil {
+			log.Println(UpdateError)
+		}else{
+			log.Println("Message ID added to messages list for the specified Chat")
+		}
 	}
 }
 
