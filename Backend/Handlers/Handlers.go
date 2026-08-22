@@ -121,7 +121,22 @@ func SendMessage(GinContext *gin.Context){
 				return
 			}
 
-			log.Println(SessionData.UserID)
+			SenderID := SessionData.UserID
+			log.Println("Sender: ", SenderID)
+			ReceiverID := GinContext.Param("ReceiverID")
+			log.Println("Receiver: ", ReceiverID)
+			ConvertedReceiverID, err := bson.ObjectIDFromHex(ReceiverID)
+			if err != nil {
+				log.Println(err)
+				return
+			}else{
+				if HelperFunctions.UserExistsByID(ConvertedReceiverID){
+					log.Println("The receiver user exists")
+				}else{
+					log.Println("The receiver user does not exist")
+					return
+				}
+			}
 		}
 	}
 	// 2. Validate whether the receiver user exists
