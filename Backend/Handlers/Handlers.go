@@ -35,7 +35,7 @@ func Login(GinContext *gin.Context){
 				GinContext.JSON(401, gin.H{"message": "Wrong Password"})
 			}else{
 				SessionID := uuid.New().String()
-				SessionData, SessionError := json.Marshal(Redis.Session{SessionID: SessionID, UserID:TargetUser.ID})
+				SessionData, SessionError := json.Marshal(Redis.Session{UserID:TargetUser.ID})
 				if SessionError != nil{
 					log.Println(SessionError)
 				}
@@ -102,6 +102,28 @@ func Register(GinContext *gin.Context){
 func SendMessage(GinContext *gin.Context){
 	// TODO: Follow the steps below
 	// 1. Get the sender's data via the session cookie
+	SessionCookie, err := GinContext.Cookie("SessionID")
+
+	if err != nil{
+		log.Println(err)
+	}else{
+		log.Println(SessionCookie)
+		RedisSession, err := Redis.Client.Get(context.TODO(), SessionCookie).Result()
+		if err != nil{
+			log.Println(err)
+		}else{
+			var SessionData Redis.Session;
+			RedisData := []byte(RedisSession)
+			err := json.Unmarshal(RedisData, &SessionData)
+
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			log.Println(SessionData.UserID)
+		}
+	}
 	// 2. Validate whether the receiver user exists
 	// 3. Validate whether a chat between the sender and the receiver exists, if not send a request to the receiver
 	// 3.1. Send the sender message regardless of whether the receiver accepts the chat invitation or not

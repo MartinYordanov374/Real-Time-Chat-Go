@@ -20,7 +20,6 @@ func AuthMiddleware() gin.HandlerFunc{
 
 		}else{
 			GinContext.Next()
-			GinContext.String(http.StatusOK, "This session exists in redis")
 		}
 	}
 }
