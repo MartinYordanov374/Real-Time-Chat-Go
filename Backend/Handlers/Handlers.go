@@ -137,32 +137,18 @@ func SendMessage(GinContext *gin.Context){
 					if !HelperFunctions.ChatRequestSent(SenderID, ConvertedReceiverID) {
 
 						HelperFunctions.SendChatRequest(SenderID, ConvertedReceiverID)
-						if HelperFunctions.ChatExistsBetweenUsers(SenderID, ConvertedReceiverID){
-							// TODO: Create message object with the chat ID
-							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
-							HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
-						}else{
-							// TODO: Create chat between the users and a sender message ID to this chat
-							// TODO: Create a request object from sender to reciever
-							// NOTE: No more messages can be sent until the receiver accepts the request
-							HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
-							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
-							log.Println(CurrentChatID)
-							HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
-
-						}
+						HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
+						CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
+						HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
 					}else{
 						if HelperFunctions.IsChatRequestAccepted(SenderID, ConvertedReceiverID){
-							HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
 							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
-							log.Println(CurrentChatID)
 							HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
 
 						}else{
 							log.Println("The request hasn't been answered yet. You can only send one message before a request is approved.")
 						}
 					}
-
 				}else{
 					log.Println("The receiver user does not exist")
 					return
