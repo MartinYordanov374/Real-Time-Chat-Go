@@ -257,6 +257,8 @@ func AcceptChatRequest(RequestID bson.ObjectID){
 	// TODO: This function shall handle a user's response to a request
 	// 1. If the request is rejected, delete all conversation and correspondingb messages with the sender
 	// 2. If the request is approved, the chat remains and the sender can send more messages than just one.
+
+	// TODO: Verify that the requesting user ID is the same as RECEIVER ID for the said request
 	filter := bson.M{"_id": RequestID}
 	Update := bson.M{
 		"$set": bson.M{
@@ -271,6 +273,7 @@ func AcceptChatRequest(RequestID bson.ObjectID){
 }
 
 func RejectChatRequest(RequestID bson.ObjectID){
+	// TODO: Verify that the requesting user ID is the same as RECEIVER ID for the said request
 	filter := bson.M{"_id": RequestID}
 	Update := bson.M{
 		"$set": bson.M{
@@ -283,4 +286,60 @@ func RejectChatRequest(RequestID bson.ObjectID){
 		log.Println(err)
 	}
 	// TODO: Delete the respective conversation and all associated messages upon rejection
+	DeleteRejectedRequestChat(RequestID)
+}
+
+func DeleteRejectedRequestChat(RequestID bson.ObjectID){
+	var request MongoConfig.Request
+	filter :=  bson.M{"_id": RequestID}
+	err := GlobalVariables.MongoRequestsCollection.FindOne(context.TODO(), filter).Decode(&request)
+	if err != nil{
+		log.Println(err)
+	}
+
+	var chat MongoConfig.Chat
+	chatFilter := bson.M{
+		"$or": []bson.M{
+			{
+				"creator_id":  request.SenderID,
+				"receiver_id": request.ReceiverID,
+			},
+			{
+				"creator_id":  request.ReceiverID,
+				"receiver_id": request.SenderID,
+			},
+		},
+	}
+
+	ChatErr := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), chatFilter).Decode(&chat)
+
+	if ChatErr != nil {
+		log.Println(ChatErr)
+	}
+
+
+	messageFilter := bson.M{
+		"$or": []bson.M{
+			{"chat_id": chat.ID},
+			{"_id": bson.M{"$in": chat.Messages}},
+		},
+	}
+
+	_, MessagesErr := GlobalVariables.MongoMessagesCollection.DeleteMany( context.TODO(), messageFilter)
+
+	if MessagesErr != nil {
+		log.Println(MessagesErr)
+	}
+
+	_, ChatDelErr := GlobalVariables.MongoChatsCollection.DeleteOne(context.TODO(),bson.M{"_id": chat.ID})
+	if ChatDelErr != nil{
+		log.Println(ChatDelErr)
+	}
+
+	_, RequestDelErr := GlobalVariables.MongoRequestsCollection.DeleteOne(context.TODO(), bson.M{"_id": RequestID})
+
+	if RequestDelErr != nil {
+		log.Println(RequestDelErr)
+	}
+
 }
