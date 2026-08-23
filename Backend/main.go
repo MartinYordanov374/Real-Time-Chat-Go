@@ -6,6 +6,8 @@ import(
 	"RealTimeChatApp/Backend/Mongo"
 	"RealTimeChatApp/Backend/Middlewares"
 	"RealTimeChatApp/Backend/WebSockets"
+	"RealTimeChatApp/Backend/GlobalVariables"
+	"log"
 )
 
 func main(){
@@ -16,6 +18,9 @@ func main(){
 
 	// TODO: Make the login and register endpoints unavailable for logged registers
 	// TODO: Create a logout endpoint
+
+	WebSocketsHub := WebSockets.NewHub()
+	GlobalVariables.WebSocketsHub = WebSocketsHub
 
 	router.POST("/login", HandlerFunctions.Login)
 
