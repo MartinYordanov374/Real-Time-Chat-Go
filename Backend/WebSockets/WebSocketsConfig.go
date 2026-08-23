@@ -18,8 +18,17 @@ var ConnectionUpgrader = websocket.Upgrader{
 	},
 }
 
+type Handler struct {
+	Hub *Hub
+}
 
-func HandleWebSocketConnection(GinContext *gin.Context){
+func CreateHandler(Hub *Hub) *Handler{
+	return &Handler{
+		Hub: Hub,
+	}
+}
+
+func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
 	SocketConnection, err := ConnectionUpgrader.Upgrade(GinContext.Writer, GinContext.Request, nil)
 	if err != nil {
 		log.Println("Connection upgrade error: ", err)
@@ -58,5 +67,7 @@ func HandleWebSocketConnection(GinContext *gin.Context){
 
 		log.Println(Client)
 		// TODO: Find a way to reference the target hub here without import cycles
+		Handler.Hub.RegisterClient(Client)
+		log.Println(Handler.Hub)
 	}
 }

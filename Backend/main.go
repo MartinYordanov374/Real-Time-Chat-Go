@@ -6,7 +6,6 @@ import(
 	"RealTimeChatApp/Backend/Mongo"
 	"RealTimeChatApp/Backend/Middlewares"
 	"RealTimeChatApp/Backend/WebSockets"
-	"RealTimeChatApp/Backend/GlobalVariables"
 )
 
 func main(){
@@ -19,8 +18,7 @@ func main(){
 	// TODO: Create a logout endpoint
 
 	WebSocketsHub := WebSockets.NewHub()
-	GlobalVariables.WebSocketsHub = WebSocketsHub
-
+	WebSocketsHandler := WebSockets.CreateHandler(WebSocketsHub)
 	router.POST("/login", HandlerFunctions.Login)
 
 	router.POST("/register", HandlerFunctions.Register)
@@ -32,6 +30,6 @@ func main(){
 	router.POST("/InviteUserToGroupChat/:UserID/:ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.InviteUserToGroupChat)
 	router.POST("/AcceptChatRequest/:RequestID", Middlewares.AuthMiddleware(), HandlerFunctions.AcceptChatRequest)
 	router.POST("/RejectChatRequest/:RequestID", Middlewares.AuthMiddleware(), HandlerFunctions.RejectChatRequest)
-	router.GET("/ws", Middlewares.AuthMiddleware(), WebSockets.HandleWebSocketConnection)
+	router.GET("/ws", Middlewares.AuthMiddleware(), WebSocketsHandler.HandleWebSocketConnection)
 	router.Run()
 }
