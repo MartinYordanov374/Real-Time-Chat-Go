@@ -169,9 +169,23 @@ func AcceptChatRequest(GinContext *gin.Context){
 	// TODO: This function shall handle a user's response to a request
 	// 1. If the request is rejected, delete all conversation and correspondingb messages with the sender
 	// 2. If the request is approved, the chat remains and the sender can send more messages than just one.
+	RequestID := GinContext.Param("RequestID")
+	ConvertedRequestID, err := bson.ObjectIDFromHex(RequestID)
+	HelperFunctions.AcceptChatRequest(ConvertedRequestID)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 }
 
 func RejectChatRequest(GinContext *gin.Context){
+	RequestID := GinContext.Param("RequestID")
+	ConvertedRequestID, err := bson.ObjectIDFromHex(RequestID)
+	HelperFunctions.RejectChatRequest(ConvertedRequestID)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 }
 

@@ -257,12 +257,30 @@ func AcceptChatRequest(RequestID bson.ObjectID){
 	// TODO: This function shall handle a user's response to a request
 	// 1. If the request is rejected, delete all conversation and correspondingb messages with the sender
 	// 2. If the request is approved, the chat remains and the sender can send more messages than just one.
+	filter := bson.M{"_id": RequestID}
+	Update := bson.M{
+		"$set": bson.M{
+			"request_status": MongoConfig.RequestAccepted,
+		},
+	}
+
+	_, err := GlobalVariables.MongoRequestsCollection.UpdateOne(context.TODO(), filter, Update)
+	if err != nil{
+		log.Println(err)
+	}
 }
 
 func RejectChatRequest(RequestID bson.ObjectID){
+	filter := bson.M{"_id": RequestID}
+	Update := bson.M{
+		"$set": bson.M{
+			"request_status": MongoConfig.RequestRejected,
+		},
+	}
 
-}
-
-func RetrieveRequestById(RequestID bson.ObjectID) *MongoConfig.Request{
-	return nil
+	_, err := GlobalVariables.MongoRequestsCollection.UpdateOne(context.TODO(), filter, Update)
+	if err != nil{
+		log.Println(err)
+	}
+	// TODO: Delete the respective conversation and all associated messages upon rejection
 }
