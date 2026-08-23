@@ -7,14 +7,13 @@ func NewHub() *Hub{
 	}
 }
 
-func RegisterClient(TargetHub *Hub, Client *Client){
+func (TargetHub *Hub) RegisterClient(Client *Client){
 	TargetHub.Mutex.Lock()
 	defer TargetHub.Mutex.Unlock()
-
 	TargetHub.ActiveClients[Client] = true
 }
 
-func UnregisterClient(TargetHub *Hub, Client *Client){
+func (TargetHub *Hub) UnregisterClient(Client *Client){
 	TargetHub.Mutex.Lock()
 	defer TargetHub.Mutex.Unlock()
 

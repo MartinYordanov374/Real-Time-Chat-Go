@@ -7,7 +7,6 @@ import(
 	"RealTimeChatApp/Backend/Middlewares"
 	"RealTimeChatApp/Backend/WebSockets"
 	"RealTimeChatApp/Backend/GlobalVariables"
-	"log"
 )
 
 func main(){
@@ -33,6 +32,6 @@ func main(){
 	router.POST("/InviteUserToGroupChat/:UserID/:ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.InviteUserToGroupChat)
 	router.POST("/AcceptChatRequest/:RequestID", Middlewares.AuthMiddleware(), HandlerFunctions.AcceptChatRequest)
 	router.POST("/RejectChatRequest/:RequestID", Middlewares.AuthMiddleware(), HandlerFunctions.RejectChatRequest)
-	router.GET("/ws", WebSockets.HandleWebSocketConnection)
+	router.GET("/ws", Middlewares.AuthMiddleware(), WebSockets.HandleWebSocketConnection)
 	router.Run()
 }
