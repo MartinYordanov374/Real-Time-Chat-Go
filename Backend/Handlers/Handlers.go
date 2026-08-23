@@ -133,9 +133,7 @@ func SendMessage(GinContext *gin.Context){
 				return
 			}else{
 				if HelperFunctions.UserExistsByID(ConvertedReceiverID){
-					log.Println("The receiver user exists")
 					if !HelperFunctions.ChatRequestSent(SenderID, ConvertedReceiverID) {
-
 						HelperFunctions.SendChatRequest(SenderID, ConvertedReceiverID)
 						HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
 						CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
@@ -145,15 +143,14 @@ func SendMessage(GinContext *gin.Context){
 						if RequestStatus == MongoConfig.RequestAccepted{
 							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
 							HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
-
 						}else if RequestStatus == MongoConfig.RequestPending{
-							log.Println("The request hasn't been answered yet. You can only send one message before a request is approved.")
+							GinContext.JSON(202, gin.H{"message":"The request hasn't been answered yet. You can only send one message before a request is approved."})
 						}else{
-							log.Println("In any other case the conversation is deleted")
+							GinContext.JSON(404, gin.H{"message":"In any other case the conversation is deleted"})
 						}
 					}
 				}else{
-					log.Println("The receiver user does not exist")
+					GinContext.JSON(404, gin.H{"message": "The receiver user does not exist"})
 					return
 				}
 			}

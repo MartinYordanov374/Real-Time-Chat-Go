@@ -129,10 +129,8 @@ func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bo
 	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&chat)
 
 	if err != nil {
-		log.Println("Chat between those users does not exist, creating chat...")
 		return false
 	}else{
-		log.Println("The chat between those users exists, sending message...")
 		return true
 	}
 
@@ -167,7 +165,6 @@ func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content s
 	if err != nil{
 		log.Println(err)
 	}else{
-		log.Println("Message object created")
 		AddMessageToChat(newMessage, ChatID)
 	}
 }
