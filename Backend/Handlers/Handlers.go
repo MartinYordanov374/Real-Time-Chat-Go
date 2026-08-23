@@ -165,10 +165,14 @@ func SendMessage(GinContext *gin.Context){
 }
 
 
-func RespondToChatRequest(GinContext *gin.Context){
+func AcceptChatRequest(GinContext *gin.Context){
 	// TODO: This function shall handle a user's response to a request
 	// 1. If the request is rejected, delete all conversation and correspondingb messages with the sender
 	// 2. If the request is approved, the chat remains and the sender can send more messages than just one.
+}
+
+func RejectChatRequest(GinContext *gin.Context){
+
 }
 
 func Logout(GinContext *gin.Context){

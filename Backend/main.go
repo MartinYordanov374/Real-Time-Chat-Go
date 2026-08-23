@@ -24,10 +24,10 @@ func main(){
 	router.POST("/logout", Middlewares.AuthMiddleware(), HandlerFunctions.Logout)
 
 	router.GET("/RetrieveChat/:ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.RetrieveChat)
-	router.POST("/RespondToRequest/:RequestID", Middlewares.AuthMiddleware(), HandlerFunctions.RespondToChatRequest)
 	router.POST("/SendMessage/:ReceiverID", Middlewares.AuthMiddleware(), HandlerFunctions.SendMessage)
 	router.POST("/InviteUserToGroupChat/:UserID/:ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.InviteUserToGroupChat)
-
+	router.POST("/AcceptChatRequest/:RequestID", Middlewares.AuthMiddleware(), HandlerFunctions.AcceptChatRequest)
+	router.POST("/RejectChatRequest/:RequestID", Middlewares.AuthMiddleware(), HandlerFunctions.RejectChatRequest)
 	router.GET("/ws", WebSockets.HandleWebSocketConnection)
 	router.Run()
 }

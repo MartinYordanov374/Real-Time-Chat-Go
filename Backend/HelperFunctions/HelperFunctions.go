@@ -251,3 +251,18 @@ func GetChatRequestStatus(SenderID bson.ObjectID, ReceiverID bson.ObjectID) Mong
 	}
 	return TargetRequest.Status
 }
+
+
+func AcceptChatRequest(RequestID bson.ObjectID){
+	// TODO: This function shall handle a user's response to a request
+	// 1. If the request is rejected, delete all conversation and correspondingb messages with the sender
+	// 2. If the request is approved, the chat remains and the sender can send more messages than just one.
+}
+
+func RejectChatRequest(RequestID bson.ObjectID){
+
+}
+
+func RetrieveRequestById(RequestID bson.ObjectID) *MongoConfig.Request{
+	return nil
+}
