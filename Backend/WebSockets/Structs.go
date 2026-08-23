@@ -3,12 +3,11 @@ package WebSockets
 import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"github.com/gorilla/websocket"
-
+	"sync"
 )
 type Hub struct {
 	ActiveClients map[*Client]bool
-	RegisterClient chan *Client
-	UnregisterClient chan *Client
+	Mutex sync.RWMutex
 }
 
 type Client struct {
