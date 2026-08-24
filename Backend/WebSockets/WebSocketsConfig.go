@@ -54,27 +54,32 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
 
 	sub := Redis.Client.Subscribe(context.TODO(), "Message")
 
-	go WritePump(Client)
-	go ReadPump(Handler.Hub)
+	go Client.WritePump()
+	go Client.ReadPump()
 	for {
 		msg, err := sub.ReceiveMessage(context.TODO())
 		if err != nil {
 			log.Println(err)
 		}
+		log.Println(msg.Payload)
+		// TODO: Upon incoming message, the hub finds the client, and uses the write pump function to write the message
+		// Go over the active clients
+		// Find the corresponding receiver ID in the active connections
+		// Write message to their send channel
+		// Write this information to their socket connection channel
 
-		log.Println(msg)
-
-	// TODO: Find a way to use the hub to find the correct active connection and send the message there
 	}
 }
 
-func WritePump(Client *Client){
+func (Client *Client) WritePump(){
 	// TODO: Implement the write pump
 	// Its purpose is to utilize the socket channel to write data to from the sendchannel of the target client
 
+	// 1. Constantly read from send channel
+	// 2. Write from send channel to socket connection, using the WriteMessage function
 }
 
-func ReadPump(Hub *Hub){
+func (Client *Client) ReadPump(){
 	// TODO: Implement the Read Pump
 	// Its purpose is to take notice of any user changes, i.e., disconnected, is typing, etc.
 }
