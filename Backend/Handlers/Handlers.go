@@ -145,7 +145,8 @@ func SendMessage(GinContext *gin.Context){
 							HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
 							// TODO: Create a struct for pub/sub message that includes the receiver ID and TextContent
 							// TODO: Marshal that struct below and publish it
-							MarshaledData, err := json.Marshal(RequestBody.TextContent)
+							RedisMessage := GlobalVariables.RedisMessage{SenderID, RequestBody.TextContent}
+							MarshaledData, err := json.Marshal(RedisMessage)
 							if err != nil {
 								log.Println(err)
 							}

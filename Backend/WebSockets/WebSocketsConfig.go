@@ -52,7 +52,7 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
 
 	Handler.Hub.RegisterClient(Client)
 
-	sub := Redis.Client.Subscribe(context.TODO(), "Message.Received")
+	sub := Redis.Client.Subscribe(context.TODO(), "Message")
 
 	go WritePump()
 	go ReadPump(Handler.Hub)
@@ -64,6 +64,7 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
 
 		log.Println(msg)
 	}
+	// TODO: Forward the received message to the specified client's send channel via the write pump
 
 }
 
