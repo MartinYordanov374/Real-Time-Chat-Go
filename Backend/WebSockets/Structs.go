@@ -10,6 +10,7 @@ type Hub struct {
 	Mutex sync.RWMutex
 }
 
+// TODO: Make the channel buffered
 type Client struct {
 	UserID bson.ObjectID
 	Connection *websocket.Conn

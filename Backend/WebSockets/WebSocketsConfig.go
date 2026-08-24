@@ -53,7 +53,7 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
 	}
 
 	Handler.Hub.RegisterClient(Client)
-
+	// TODO: Move the subscription out of the socket connection handler to avoid duplications
 	sub := Redis.Client.Subscribe(context.TODO(), "Message")
 
 	go Client.WritePump()
@@ -89,6 +89,7 @@ func (Client *Client) WritePump(){
 			log.Println("An error occurred")
 			log.Println(err)
 		}
+		// TODO: Handle what happens after closing the channels
 	}
 }
 
