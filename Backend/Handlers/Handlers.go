@@ -143,6 +143,16 @@ func SendMessage(GinContext *gin.Context){
 						if RequestStatus == MongoConfig.RequestAccepted{
 							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
 							HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
+							// TODO: Create a struct for pub/sub message that includes the receiver ID and TextContent
+							// TODO: Marshal that struct below and publish it
+							MarshaledData, err := json.Marshal(RequestBody.TextContent)
+							if err != nil {
+								log.Println(err)
+							}
+							pubSubErr := Redis.Client.Publish(context.TODO(), "Message", MarshaledData).Err()
+							if pubSubErr != nil{
+								log.Println(pubSubErr)
+							}
 						}else if RequestStatus == MongoConfig.RequestPending{
 							GinContext.JSON(202, gin.H{"message":"The request hasn't been answered yet. You can only send one message before a request is approved."})
 						}else{

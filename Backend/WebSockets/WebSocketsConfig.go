@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"log"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"context"
+	"RealTimeChatApp/Backend/Redis"
 )
 
 var ConnectionUpgrader = websocket.Upgrader{
@@ -47,10 +49,22 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
 		Connection: SocketConnection,
 		SendChannel: make(chan []byte),
 	}
+
 	Handler.Hub.RegisterClient(Client)
+
+	sub := Redis.Client.Subscribe(context.TODO(), "Message.Received")
 
 	go WritePump()
 	go ReadPump(Handler.Hub)
+	for {
+		msg, err := sub.ReceiveMessage(context.TODO())
+		if err != nil {
+			log.Println(err)
+		}
+
+		log.Println(msg)
+	}
+
 }
 
 func WritePump(){
