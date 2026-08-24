@@ -14,6 +14,6 @@ var MongoRequestsCollection *mongo.Collection
 var SessionDuration = 1*time.Hour
 var CookieExpirationSeconds = 3600
 type RedisMessage struct {
-	UserID bson.ObjectID
-	Content string
+	UserID bson.ObjectID `json:"UserID"`
+	Content string		 `json:"Content"`
 }
