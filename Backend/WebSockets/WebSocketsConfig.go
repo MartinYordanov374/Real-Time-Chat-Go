@@ -5,9 +5,7 @@ import (
 	"github.com/gorilla/websocket"
 	"net/http"
 	"log"
-	"RealTimeChatApp/Backend/Redis"
-	"context"
-	"encoding/json"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 var ConnectionUpgrader = websocket.Upgrader{
@@ -37,37 +35,28 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
 
 	log.Println("Upgraded to websocket!")
 
-	SessionCookie, err := GinContext.Cookie("SessionID")
-	if err != nil{
-		log.Println(err)
-		return
+	ContextValue, Exists := GinContext.Get("UserID")
+
+	if !Exists {
+		GinContext.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized to perform this action"})
 	}
 
-	// TODO: This is repeating code, move it to a seperate file
-	RedisSession, err := Redis.Client.Get(context.TODO(), SessionCookie).Result()
-	if err != nil{
-		log.Println(err)
-		return
-	}else{
-		var SessionData Redis.Session;
-		RedisData := []byte(RedisSession)
-		err := json.Unmarshal(RedisData, &SessionData)
-
-		if err != nil {
-			log.Println(err)
-			return
-		}
-
-		UserID := SessionData.UserID
-		Client := &Client{
-			UserID: UserID,
-			Connection: SocketConnection,
-			SendChannel: make(chan []byte),
-		}
-
-		log.Println(Client)
-		// TODO: Find a way to reference the target hub here without import cycles
-		Handler.Hub.RegisterClient(Client)
-		log.Println(Handler.Hub)
+	UserID := ContextValue.(bson.ObjectID)
+	Client := &Client{
+		UserID: UserID,
+		Connection: SocketConnection,
+		SendChannel: make(chan []byte),
 	}
+	Handler.Hub.RegisterClient(Client)
+
+	go WritePump()
+	go ReadPump(Handler.Hub)
+}
+
+func WritePump(){
+
+}
+
+func ReadPump(Hub *Hub){
+
 }
