@@ -23,6 +23,7 @@ func main(){
 
 	router.POST("/register", HandlerFunctions.Register)
 
+	// TODO; Implement logout
 	router.POST("/logout", Middlewares.AuthMiddleware(), HandlerFunctions.Logout)
 
 	router.GET("/RetrieveChat/:ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.RetrieveChat)

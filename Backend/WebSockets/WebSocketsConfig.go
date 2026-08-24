@@ -69,23 +69,19 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
 		if err != nil{
 			log.Println(err)
 		}
-
-		log.Println(PayloadData.UserID)
+		// TODO: Consider what happens when the user is offline when they are sent a message
+		// Store the messages in the DB, cache the last 100 messages in Redis
+		// When they come back check if any new messages compared to the latest Redis cached one have arrived
+		// If yes, fetch directly from the DB, otherwise fetch from Redis
+		//
+		// TODO: Implement sent/delievered functionality
+		// TODO: Implement a writing indicator functionality
+		// TODO: Implement an online/offline status indicator functionality
 		SendMessageToClient(Handler.Hub, PayloadData.UserID, PayloadData.Content)
-		// TODO: Upon incoming message, the hub finds the client, and uses the write pump function to write the message
-		// Go over the active clients
-		// Find the corresponding receiver ID in the active connections
-		// Write message to their send channel
-		// Write this information to their socket connection channel
 	}
 }
 
 func (Client *Client) WritePump(){
-	// TODO: Implement the write pump
-	// Its purpose is to utilize the socket channel to write data to from the sendchannel of the target client
-
-	// 1. Constantly read from send channel
-	// 2. Write from send channel to socket connection, using the WriteMessage function\
 	for{
 		msg := <-Client.SendChannel
 		err := Client.Connection.WriteMessage(websocket.TextMessage,msg)
