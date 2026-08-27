@@ -3,7 +3,7 @@ import ChatList from "../ChatList/ChatList";
 
 export default function page() {
   return (
-    <div>
+    <div className="flex">
         <ChatList/>
         {/* TODO: Selecting a contact from the chat list 
         will open the chat box with the corresponding conversation */}

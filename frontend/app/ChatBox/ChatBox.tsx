@@ -33,7 +33,7 @@ export default function ChatBox() {
         sender: false
     }]
   return (
-    <div className="max-w-md w-full bg-white max-h-screen overflow-scroll p-10">
+    <div className="flex flex-col-reverse max-w-md h-screen w-full bg-gray-100 max-h-screen overflow-scroll p-10">
         {Messages.map((message) => (
             <MessageBox 
             id ={message.id}
