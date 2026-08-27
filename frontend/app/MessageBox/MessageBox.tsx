@@ -12,7 +12,7 @@ export default function MessageBox(MessageProps : message) {
         {MessageProps.sender 
         ?
         <div className='flex w-full justify-end max-w-[75%]'>
-            <div className='bg-sky-600 rounded-lg p-4 mt-2 min-w-[70px]'>
+            <div className='bg-blue-500 rounded-lg p-4 mt-2 min-w-[70px]'>
                 {MessageProps.content}
                 <p className='text-xs text-right'>5:40 PM</p>
             </div>
