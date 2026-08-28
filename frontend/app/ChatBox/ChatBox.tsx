@@ -54,8 +54,8 @@ export default function ChatBox() {
         sender: true
     }]
   return (
-    <div className="w-full bg-gray-100 max-h-screen overflow-scroll">
-        <div className='border border-gray-900sticky top-0 bg-white'>
+    <div className="w-full bg-gray-100">
+        <div className='border border-gray-900 sticky top-0 bg-white'>
             <h2 className='text-gray-900 pl-8 pt-8'>Username</h2>
             {online 
                 ?
@@ -64,7 +64,7 @@ export default function ChatBox() {
                 <p className='text-gray-400 pl-8 pb-4 border-bottom border-gray-900'> Offline </p>
             }
         </div>
-        <div className='flex flex-col-reverse max-w h-screen p-10'>
+        <div className='flex flex-col-reverse max-w h-screen p-10 max-h-screen overflow-scroll'>
             {Messages.map((message) => (
                 <MessageBox 
                 key ={message.id}
