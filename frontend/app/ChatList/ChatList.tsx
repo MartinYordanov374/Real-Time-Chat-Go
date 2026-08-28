@@ -2,9 +2,9 @@ import React from 'react'
 
 export default function ChatList() {
   return (
-    <div className="justify-left w-[40%]">
+    <div className="justify-left w-[40%] bg-white text-gray-900 border-r">
       {/* 1. User Header */}
-      <div>
+      <div className='border-b '>
         <h2>Username</h2>
         <p>Active status</p>
       </div>

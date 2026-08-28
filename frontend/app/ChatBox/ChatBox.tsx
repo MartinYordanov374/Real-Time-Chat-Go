@@ -55,13 +55,13 @@ export default function ChatBox() {
     }]
   return (
     <div className="flex h-screen flex-col w-full bg-gray-100">
-        <div className='border border-gray-900 sticky top-0 bg-white'>
+        <div className='border-b border-gray-900 sticky top-0 bg-white'>
             <h2 className='text-gray-900 pl-8 pt-8'>Username</h2>
             {online 
                 ?
                 <p className='text-emerald-500 font-bold pl-8 pb-4 border-b border-gray-900'> Online </p>
                 :
-                <p className='text-gray-400 pl-8 pb-4 border-bottom border-gray-900'> Offline </p>
+                <p className='text-gray-400 pl-8 pb-4 border-b border-gray-900'> Offline </p>
             }
         </div>
         <div className='flex flex-col-reverse max-w h-screen p-10 max-h-screen overflow-scroll'>
@@ -72,7 +72,7 @@ export default function ChatBox() {
                 sender={message.sender}/>
             ))}
         </div>
-        <div className='border border-gray-900 sticky bottom-0 bg-white p-4 gap-2'>
+        <div className='border-t border-gray-900 sticky bottom-0 bg-white p-4 gap-2'>
             <div className='flex items-end bg-gray-200 rounded-lg text-gray-900 p-4 flex-1'>
                 <textarea 
                 className='
