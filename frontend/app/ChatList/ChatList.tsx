@@ -19,14 +19,17 @@ export default function ChatList() {
         <p>Active status</p>
       </div>  
       {/* 2. Search Bar */}
-      <div className='border-b'>
-        <input placeholder='Search users by username' className='p-4 w-full'/>
+      <div className='p-4'>
+        <input 
+        className="p-4 w-full focus:outline-none bg-gray-200 rounded-xl text-sm"
+        placeholder='Find contacts by username'/>
       </div>
       {/* 3. Contacts List */}
       {contacts.map((Contact) => (
-        <div className='flex flex-col gap-2 p-2 hover:bg-gray-100 cursor-pointer'>
+        <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer'>
           <div className='flex'>
-            <h2 className='font-semibold'>{Contact.Username}</h2>
+            <div className=' flex size-12 rounded-full bg-blue-500 p-2 justify-center items-center'>PFP</div>
+            <h2 className='font-semibold mt-3 pl-2'>{Contact.Username}</h2>
             <p className='ml-auto text-gray-400 text-sm'>{Contact.LastMessageDate}</p>
           </div>
           {/* TODO: Cut out the message after a certain length */}
