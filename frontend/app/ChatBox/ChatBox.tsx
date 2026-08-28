@@ -54,12 +54,12 @@ export default function ChatBox() {
         sender: true
     }]
   return (
-    <div className="w-full bg-gray-100">
+    <div className="flex h-screen flex-col w-full bg-gray-100">
         <div className='border border-gray-900 sticky top-0 bg-white'>
             <h2 className='text-gray-900 pl-8 pt-8'>Username</h2>
             {online 
                 ?
-                <p className='text-emerald-500 font-bold pl-8 pb-4 border-bottom border-gray-900'> Online </p>
+                <p className='text-emerald-500 font-bold pl-8 pb-4 border-b border-gray-900'> Online </p>
                 :
                 <p className='text-gray-400 pl-8 pb-4 border-bottom border-gray-900'> Offline </p>
             }
