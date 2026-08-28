@@ -12,9 +12,9 @@ export default function ChatList() {
     LastMessageDate: "12:15 PM"
   }]
   return (
-    <div className="justify-left w-[50%] bg-white text-gray-900 border-r">
+    <div className="justify-left w-[50%] bg-white text-gray-900">
       {/* 1. User Header */}
-      <div className='flex border-b p-4'>
+      <div className='flex shadow-xs p-4'>
         <div className='flex flex-col size-12 rounded-full bg-blue-500 p-2 justify-center items-center'>PFP</div>
         <div className='pl-4 flex flex-col'>
           <span className='font-bold'>Username</span>
