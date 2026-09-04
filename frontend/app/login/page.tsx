@@ -1,6 +1,6 @@
 "use client"
 import Login from '../../Helpers/Login'
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 export default function LoginPage() {
 
   const [username, setUsername] = useState('')

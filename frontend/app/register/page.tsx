@@ -1,4 +1,27 @@
+"use client"
+import {useState} from 'react'
+import Register from '../../Helpers/Register'
+
 export default function RegisterPage() {
+
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  function HandleRegister(){
+    // TODO: Check if the confirm password field value matches the password field value
+    PerformRegister()
+  }
+
+  async function PerformRegister(){
+    try{
+      let UserLoginRes = await Register(username, email, password)
+    }
+    catch(err){
+      console.log(err.response?.data.message)
+    }
+  }
+  
   return (
     <div className="flex items-center min-h-screen justify-center bg-gray-50">
       <div className="w-full max-w-md rounded-lg p-8 shadow-xl">
@@ -29,6 +52,7 @@ export default function RegisterPage() {
             focus:outline-none
             focus:ring-2 
             focus:ring-blue-500"
+            onChange={(e) => setUsername(e.target.value)}
           />
           <label className="text-gray-800 font-semibold">Email</label>
           <input 
@@ -48,6 +72,7 @@ export default function RegisterPage() {
             focus:outline-none
             focus:ring-2 
             focus:ring-blue-500"
+            onChange={(e) => setEmail(e.target.value)}
           />
           <label className="text-gray-800 font-semibold">Password</label>
           <input 
@@ -67,6 +92,7 @@ export default function RegisterPage() {
             focus:ring-2 
             focus:ring-blue-500
             mb-4"
+            onChange={(e) => setPassword(e.target.value)}
           />
           <label className="text-gray-800 font-semibold">Confirm Password</label>
           <input 
@@ -99,6 +125,7 @@ export default function RegisterPage() {
             text-white
             font-semibold
             "
+            onClick={() => HandleRegister()}
           >
             Sign up
           </button>
