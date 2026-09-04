@@ -40,7 +40,7 @@ export default function ChatList() {
           </div>
           {/* TODO: Cut out the message after a certain length */}
           <div className='flex-row'>
-            <p className='text-sm'>{Contact.LastMessage}</p>
+            <p className='text-sm'>{Contact.LastMessage.split('').length > 83 ? Contact.LastMessage.slice(0, 83)+"..." : Contact.LastMessage}</p>
           </div>
         </div>
       ))}
