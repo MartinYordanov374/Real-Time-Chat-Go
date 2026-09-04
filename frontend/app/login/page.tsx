@@ -1,5 +1,5 @@
 "use client"
-import Login from '../../hooks/Login'
+import Login from '../../Helpers/Login'
 import {useEffect, useState} from 'react'
 export default function LoginPage() {
 
