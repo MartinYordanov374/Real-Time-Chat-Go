@@ -215,3 +215,12 @@ func RetrieveChat(GinContext *gin.Context){
 	// TODO: This function shall fetch the chat between the requesting user and the specified user.
 	// TODO: Retrieve the most recent, i.e., 50 or 100 messages from the chat from Redis if available
 }
+
+//TODO: implement function that fetches all chats that a user is a member of
+
+func RetrieveAllUserChats(GinContext *gin.Context){
+	// 1. Retrieve user ID from session Cookie
+	// 2. Check if Session is active in Redis sessions
+	// 3. If session is active in Redis sessions refer to the helper function to retrieve all user chats based on USER ID from the session
+	// 4. Return the chats as an object
+}
