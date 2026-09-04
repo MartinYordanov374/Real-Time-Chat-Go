@@ -32,5 +32,7 @@ func main(){
 	router.POST("/AcceptChatRequest/:RequestID", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.AcceptChatRequest)
 	router.POST("/RejectChatRequest/:RequestID", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.RejectChatRequest)
 	router.GET("/ws", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), WebSocketsHandler.HandleWebSocketConnection)
+
+	router.GET("/GetAllChats", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.RetrieveAllUserChats)
 	router.Run()
 }

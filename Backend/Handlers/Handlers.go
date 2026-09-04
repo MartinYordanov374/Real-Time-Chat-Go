@@ -220,7 +220,26 @@ func RetrieveChat(GinContext *gin.Context){
 
 func RetrieveAllUserChats(GinContext *gin.Context){
 	// 1. Retrieve user ID from session Cookie
+	SessionCookie, err := GinContext.Cookie("SessionID")
+	RedisSession, err := Redis.Client.Get(context.TODO(), SessionCookie).Result()
+	if err != nil {
+		log.Println(err)
+		log.Println("The session is inactive")
+		return
+	}
+
+	var SessionData Redis.Session;
+	RedisData := []byte(RedisSession)
+	err = json.Unmarshal(RedisData, &SessionData)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	// 2. Check if Session is active in Redis sessions
 	// 3. If session is active in Redis sessions refer to the helper function to retrieve all user chats based on USER ID from the session
 	// 4. Return the chats as an object
+
+	TargetChats := HelperFunctions.RetrieveAllUserChats(SessionData.UserID)
+	GinContext.JSON(200, gin.H{"chats":TargetChats})
 }

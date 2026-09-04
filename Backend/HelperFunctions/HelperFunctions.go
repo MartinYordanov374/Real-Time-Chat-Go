@@ -343,3 +343,27 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID){
 	}
 
 }
+
+func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat{
+	var TargetChats []MongoConfig.Chat
+	filter := bson.M{
+		"$or" : []bson.M{
+			{"sender_id": UserID},
+			{"receiver_id": UserID},
+		},
+	}
+
+	cursor, err := GlobalVariables.MongoChatsCollection.Find(context.TODO(), filter)
+	if err != nil{
+		log.Println(err)
+		return nil
+	}else{
+		err = cursor.All(context.TODO(), &TargetChats)
+		if err != nil{
+			log.Println(err)
+			return nil
+		}else{
+			return TargetChats
+		}
+	}
+}
