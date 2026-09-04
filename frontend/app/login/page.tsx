@@ -1,4 +1,24 @@
+"use client"
+import Login from '../../hooks/Login'
+import {useEffect, useState} from 'react'
 export default function LoginPage() {
+
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+
+  function HandleLogin(){
+    PerformLogin()
+  }
+
+  async function PerformLogin(){
+    try{
+      let UserLoginRes = await Login(username, password)
+      console.log(UserLoginRes.data?.message)
+    }
+    catch(err){
+      console.log(err.response?.data.message)
+    }
+  }
   return (
     <div className="flex items-center min-h-screen justify-center bg-gray-50">
       <div className="w-full max-w-md rounded-lg p-8 shadow-xl">
@@ -29,6 +49,7 @@ export default function LoginPage() {
             focus:outline-none
             focus:ring-2 
             focus:ring-blue-500"
+            onChange={(e) => setUsername(e.target.value)}
           />
           <label className="text-gray-800 font-semibold">Password</label>
           <input 
@@ -48,6 +69,7 @@ export default function LoginPage() {
             focus:ring-2 
             focus:ring-blue-500
             mb-4"
+            onChange={(e) => setPassword(e.target.value)}
           />
           <button
             type="submit"
@@ -61,6 +83,7 @@ export default function LoginPage() {
             text-white
             font-semibold
             "
+            onClick={() => HandleLogin()}
           >
             Log in
           </button>

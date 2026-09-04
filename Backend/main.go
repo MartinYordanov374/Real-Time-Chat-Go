@@ -19,18 +19,18 @@ func main(){
 
 	WebSocketsHub := WebSockets.NewHub()
 	WebSocketsHandler := WebSockets.CreateHandler(WebSocketsHub)
-	router.POST("/login", HandlerFunctions.Login)
+	router.POST("/login", Middlewares.CORSMiddleware(), HandlerFunctions.Login)
 
-	router.POST("/register", HandlerFunctions.Register)
+	router.POST("/register", Middlewares.CORSMiddleware(), HandlerFunctions.Register)
 
 	// TODO; Implement logout
-	router.POST("/logout", Middlewares.AuthMiddleware(), HandlerFunctions.Logout)
+	router.POST("/logout", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.Logout)
 
-	router.GET("/RetrieveChat/:ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.RetrieveChat)
-	router.POST("/SendMessage/:ReceiverID", Middlewares.AuthMiddleware(), HandlerFunctions.SendMessage)
-	router.POST("/InviteUserToGroupChat/:UserID/:ChatID", Middlewares.AuthMiddleware(), HandlerFunctions.InviteUserToGroupChat)
-	router.POST("/AcceptChatRequest/:RequestID", Middlewares.AuthMiddleware(), HandlerFunctions.AcceptChatRequest)
-	router.POST("/RejectChatRequest/:RequestID", Middlewares.AuthMiddleware(), HandlerFunctions.RejectChatRequest)
-	router.GET("/ws", Middlewares.AuthMiddleware(), WebSocketsHandler.HandleWebSocketConnection)
+	router.GET("/RetrieveChat/:ChatID", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.RetrieveChat)
+	router.POST("/SendMessage/:ReceiverID", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.SendMessage)
+	router.POST("/InviteUserToGroupChat/:UserID/:ChatID", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.InviteUserToGroupChat)
+	router.POST("/AcceptChatRequest/:RequestID", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.AcceptChatRequest)
+	router.POST("/RejectChatRequest/:RequestID", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.RejectChatRequest)
+	router.GET("/ws", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), WebSocketsHandler.HandleWebSocketConnection)
 	router.Run()
 }

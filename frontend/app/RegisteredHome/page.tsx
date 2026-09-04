@@ -1,6 +1,5 @@
 import ChatBox from "../ChatBox/ChatBox";
 import ChatList from "../ChatList/ChatList";
-
 export default function page() {
   return (
     <div className="flex">
