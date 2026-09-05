@@ -8,6 +8,7 @@ type message ={
 }
 export default function ChatBox() {
     let online : boolean = true
+    let isChatSelected : boolean = false
     let Messages : message[] = [{
         id: 1,
         content: "test 1",
@@ -54,6 +55,11 @@ export default function ChatBox() {
         sender: true
     }]
   return (
+    isChatSelected == false ?
+    <div className="flex h-screen flex-col w-full bg-gray-100">
+        <div className='flex flex-1 justify-center items-center'>Start or select a chat and it will appear here</div>
+    </div>
+    :
     <div className="flex h-screen flex-col w-full bg-gray-100">
         <div className='sticky top-0 bg-white flex p-4'>
             <div className='flex size-12 rounded-full bg-blue-500 p-4 justify-center items-center'>PFP</div>
