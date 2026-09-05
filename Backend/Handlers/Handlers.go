@@ -143,8 +143,7 @@ func SendMessage(GinContext *gin.Context){
 						if RequestStatus == MongoConfig.RequestAccepted{
 							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
 							HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
-							// TODO: Create a struct for pub/sub message that includes the receiver ID and TextContent
-							// TODO: Marshal that struct below and publish it
+							HelperFunctions.CacheMessageRedis(CurrentChatID, RequestBody.TextContent)
 							RedisMessage := GlobalVariables.RedisMessage{ConvertedReceiverID, RequestBody.TextContent}
 							MarshaledData, err := json.Marshal(RedisMessage)
 							if err != nil {
@@ -167,19 +166,9 @@ func SendMessage(GinContext *gin.Context){
 			}
 		}
 	}
-	// 2. Validate whether the receiver user exists
-	// 3. Validate whether a chat between the sender and the receiver exists, if not send a request to the receiver
-	// 3.1. Send the sender message regardless of whether the receiver accepts the chat invitation or not
-	// 3.2. If the receiver rejects the invitation, delete the conversation along with the messages.
-
-	// TODO: Create a CreateConversation helper function
 }
 
-
 func AcceptChatRequest(GinContext *gin.Context){
-	// TODO: This function shall handle a user's response to a request
-	// 1. If the request is rejected, delete all conversation and correspondingb messages with the sender
-	// 2. If the request is approved, the chat remains and the sender can send more messages than just one.
 	RequestID := GinContext.Param("RequestID")
 	ConvertedRequestID, err := bson.ObjectIDFromHex(RequestID)
 	HelperFunctions.AcceptChatRequest(ConvertedRequestID)
@@ -218,7 +207,7 @@ func RetrieveChat(GinContext *gin.Context){
 
 //TODO: implement function that fetches all chats that a user is a member of
 
-func RetrieveAllUserChats(GinContext *gin.Context){
+/*func RetrieveAllUserChats(GinContext *gin.Context){
 	// 1. Retrieve user ID from session Cookie
 	SessionCookie, err := GinContext.Cookie("SessionID")
 	RedisSession, err := Redis.Client.Get(context.TODO(), SessionCookie).Result()
@@ -242,4 +231,4 @@ func RetrieveAllUserChats(GinContext *gin.Context){
 
 	TargetChats := HelperFunctions.RetrieveAllUserChats(SessionData.UserID)
 	GinContext.JSON(200, gin.H{"chats":TargetChats})
-}
+    }*/

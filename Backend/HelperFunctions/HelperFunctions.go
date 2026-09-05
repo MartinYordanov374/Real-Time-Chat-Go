@@ -2,7 +2,7 @@ package HelperFunctions
 
 import (
 	"RealTimeChatApp/Backend/GlobalVariables"
-	MongoConfig "RealTimeChatApp/Backend/Mongo"
+	"RealTimeChatApp/Backend/Mongo"
 	"context"
 	"log"
 	"net/mail"
@@ -16,7 +16,6 @@ import (
 )
 
 func SetSessionCookie(GinContext *gin.Context, SessionID string) {
-	// TODO: Make the cookie last as long as the session, i.e., create a global variable for this
 	GinContext.SetCookie("SessionID", SessionID, GlobalVariables.CookieExpirationSeconds, "/", "localhost", false, false)
 }
 
@@ -133,15 +132,14 @@ func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bo
 	} else {
 		return true
 	}
-
 }
 
 func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) {
 	newChat := MongoConfig.Chat{
-		Messages:     []bson.ObjectID{},
 		CreatorID:    CreatorID,
 		ReceiverID:   ReceiverID,
-		CreationDate: time.Now()}
+		CreationDate: time.Now(),
+	}
 
 	_, err := GlobalVariables.MongoChatsCollection.InsertOne(context.TODO(), newChat)
 
@@ -152,7 +150,7 @@ func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) {
 	}
 }
 
-func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content string) {
+func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content string) MongoConfig.Message {
 	newMessage := MongoConfig.Message{
 		ID:          bson.NewObjectID(),
 		ChatID:      ChatID,
@@ -164,31 +162,8 @@ func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content s
 	_, err := GlobalVariables.MongoMessagesCollection.InsertOne(context.TODO(), newMessage)
 	if err != nil {
 		log.Println(err)
-	} else {
-		AddMessageToChat(newMessage, ChatID)
 	}
-}
-
-func AddMessageToChat(Message MongoConfig.Message, ChatID bson.ObjectID) {
-	var TargetChat MongoConfig.Chat
-	filter := bson.M{"_id": ChatID}
-	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&TargetChat)
-	if err != nil {
-		log.Println(err)
-	} else {
-		UpdateQuery := bson.M{
-			"$push": bson.M{
-				"messages": Message.ID,
-			},
-		}
-
-		_, UpdateError := GlobalVariables.MongoChatsCollection.UpdateOne(context.TODO(), filter, UpdateQuery)
-		if UpdateError != nil {
-			log.Println(UpdateError)
-		} else {
-			log.Println("Message ID added to messages list for the specified Chat")
-		}
-	}
+	return newMessage
 }
 
 func RetrieveChatID(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) bson.ObjectID {
@@ -316,10 +291,7 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID) {
 	}
 
 	messageFilter := bson.M{
-		"$or": []bson.M{
-			{"chat_id": chat.ID},
-			{"_id": bson.M{"$in": chat.Messages}},
-		},
+		"chat_id": chat.ID,
 	}
 
 	_, MessagesErr := GlobalVariables.MongoMessagesCollection.DeleteMany(context.TODO(), messageFilter)
@@ -341,7 +313,18 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID) {
 
 }
 
-func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat {
+func CacheMessageRedis(ChatID bson.ObjectID, Message string){
+	// TODO: If a message gets edited or deleted, the cache for the said conversation should be destroyed entireloy
+}
+
+func GetCachedMessages(ChatID bson.ObjectID){
+	// TODO: Implement this function so that it can bhe used to retrieve cached messages
+	// TODO: If the messages do not exist in cache,
+	// then fetch them from DB and save them via CacheMessageRedis
+}
+
+
+//func RetrieveAllUserChats(UserID bson.ObjectID) {
 	// TODO: Get rid of the lookup. Fetch the conversations. Fetch the last 50 messages only if they are not already within Redis cache.
 	// If they are not cached in Redis, cache them. Only load further messages if you need to find them. 50 per request. No lookup.
 
@@ -350,4 +333,4 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat {
 	// 3. If not, fetch the mongoDB for the last 100 messages and stores them in Redis.
 	// 4. If the users scrolls up to the 100th message, fetch the next 100 messages from and store them in Redis.
 	// 5. Redis shall contain no more than 100 of the latest messages.
-}
+//}
