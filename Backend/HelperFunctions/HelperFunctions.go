@@ -326,7 +326,7 @@ func CacheMessageRedis(Message MongoConfig.Message){
 	// TODO: Expire the stored messages after, say, 12 h
 	pipeline := Redis.Client.Pipeline()
 	pipeline.LPush(context.TODO(), key, MarshaledMessage)
-	pipeline.LTrim(context.TODO(), key, 0, 99)
+	pipeline.LTrim(context.TODO(), key, 0, 49)
 
 	_, err = pipeline.Exec(context.TODO())
 	if err != nil {
@@ -338,7 +338,7 @@ func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error){
 	// TODO: If the messages do not exist in cache,
 	// then fetch them from DB and save them via CacheMessageRedis
 	key := "chat:"+ChatID.Hex()+":messages"
-	msgs, err := Redis.Client.LRange(context.TODO(), key, 0, 99).Result()
+	msgs, err := Redis.Client.LRange(context.TODO(), key, 0, 49).Result()
 
 	if err != nil{
 		log.Println(err)
