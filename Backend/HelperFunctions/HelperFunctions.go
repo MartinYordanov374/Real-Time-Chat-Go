@@ -313,7 +313,7 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID) {
 
 }
 
-func CacheMessageRedis(ChatID bson.ObjectID, Message string){
+func CacheMessageRedis(Message MongoConfig.Message){
 	// TODO: If a message gets edited or deleted, the cache for the said conversation should be destroyed entireloy
 }
 
