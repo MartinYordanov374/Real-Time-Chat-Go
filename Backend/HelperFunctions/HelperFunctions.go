@@ -388,13 +388,13 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat{
 		log.Println(err)
 	}
 	// Retrieving Messages
-	for _, TargetChat := range TargetChats{
+	for idx, TargetChat := range TargetChats{
 		res, err := GetCachedMessages(TargetChat.ID)
 		if err != nil {
 			log.Println(err)
 		}
-
 		log.Println(res)
+		TargetChats[idx].Messages = res
 	}
 
 	return TargetChats
