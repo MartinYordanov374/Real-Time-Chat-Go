@@ -335,19 +335,17 @@ func CacheMessageRedis(Message MongoConfig.Message){
 }
 
 func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error){
-	// TODO: If the messages do not exist in cache,
-	// then fetch them from DB and save them via CacheMessageRedis
 	key := "chat:"+ChatID.Hex()+":messages"
 	msgs, err := Redis.Client.LRange(context.TODO(), key, 0, 49).Result()
 
 	if err != nil{
 		log.Println(err)
-		// NOTE: This should work because if a conversation between users exist, then it should have at least one message given that nobody deleted the original message
 		return nil, err
 	}
 
 	if len(msgs) == 0{
 		// TODO: Fetch the DB later
+		FetchLatestMessagesFromDB(ChatID)
 		return []MongoConfig.Message{}, nil
 	}
 
@@ -365,10 +363,6 @@ func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error){
 
 
 func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat{
-	// TODO: Get rid of the lookup. Fetch the conversations. Fetch the last 50 messages only if they are not already within Redis cache.
-	// If they are not cached in Redis, cache them. Only load further messages if you need to find them. 50 per request. No lookup.
-
-	// 1. Find all chats where UserID is either sender or creator
 	var TargetChats []MongoConfig.Chat
 	UserChatsFilter := bson.M{
 		"$or": []bson.M{
@@ -398,8 +392,13 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat{
 	}
 
 	return TargetChats
-	// 2. Check if messages with the corersponding Chat IDs are already cached in Redis
-	// 3. If not, fetch the mongoDB for the last 100 messages and stores them in Redis.
-	// 4. If the users scrolls up to the 100th message, fetch the next 100 messages from and store them in Redis.
-	// 5. Redis shall contain no more than 100 of the latest messages.
+}
+
+func FetchLatestMessagesFromDB(ChatID bson.ObjectID){
+	// TODO: Fetch the latest 50 messages from the DB, cache them and return to user
+	// NOTE: This function will also be used if the user scrolls beyond the cached messages.
+	// A cursor will be needed for that purpose pointing to the latest message that the user has seen in the chat.
+	filter := bson.M{"ChatID":ChatID}
+	MessagesAmount := 50
+
 }
