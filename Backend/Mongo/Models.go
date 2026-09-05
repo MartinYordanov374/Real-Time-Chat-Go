@@ -16,6 +16,8 @@ type Chat struct {
 	CreatorID    bson.ObjectID   `json:"creatorId" bson:"creator_id"`
 	ReceiverID bson.ObjectID `json:"receiverId" bson:"receiver_id"`
 	CreationDate time.Time       `json:"creationDate" bson:"creation_date"`
+	PopulatedMessages     []Message `json:"populated_messages" bson:"populated_messages"`
+
 }
 
 type Message struct {

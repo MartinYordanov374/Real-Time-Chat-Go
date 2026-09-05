@@ -1,46 +1,48 @@
 package HelperFunctions
 
-import(
-	"regexp"
-	"strings"
-	"net/mail"
-	"golang.org/x/crypto/bcrypt"
+import (
 	"RealTimeChatApp/Backend/GlobalVariables"
-	"RealTimeChatApp/Backend/Mongo"
+	MongoConfig "RealTimeChatApp/Backend/Mongo"
 	"context"
 	"log"
+	"net/mail"
+	"regexp"
+	"strings"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/bson"
-	"time"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
-func SetSessionCookie(GinContext *gin.Context, SessionID string){
+func SetSessionCookie(GinContext *gin.Context, SessionID string) {
 	// TODO: Make the cookie last as long as the session, i.e., create a global variable for this
 	GinContext.SetCookie("SessionID", SessionID, GlobalVariables.CookieExpirationSeconds, "/", "localhost", false, false)
 }
 
-func ValidateUsername(Username string) bool{
+func ValidateUsername(Username string) bool {
 	TrimmedUsername := strings.TrimSpace(Username)
-	if len(TrimmedUsername) >= 2{
+	if len(TrimmedUsername) >= 2 {
 		UsernameRegex, _ := regexp.Compile("^[a-zA-Z]{2,}$")
 
 		ValidUsername := UsernameRegex.MatchString(TrimmedUsername)
 		if ValidUsername {
 			return true
-		}else{
+		} else {
 			return false
 		}
-	}else{
+	} else {
 		return false
 	}
 }
 
-func ValidatePassword(Password string) bool{
+func ValidatePassword(Password string) bool {
 	// TODO: Move all regexes to a seperate file
 	TrimmedPassword := strings.TrimSpace(Password)
-	if len(TrimmedPassword) >= 15{
-		AtLeastOneLowerCaseRegex:= regexp.MustCompile(`[a-z]`)
-		AtLeastOneUpperCaseRegex:= regexp.MustCompile(`[A-Z]`)
+	if len(TrimmedPassword) >= 15 {
+		AtLeastOneLowerCaseRegex := regexp.MustCompile(`[a-z]`)
+		AtLeastOneUpperCaseRegex := regexp.MustCompile(`[A-Z]`)
 		AtLeastOneDigitRegex := regexp.MustCompile(`[\\d]`)
 		SpecialRegex := regexp.MustCompile(`[^a-zA-Z0-9]`)
 
@@ -49,133 +51,132 @@ func ValidatePassword(Password string) bool{
 		PasswordContainsDigit := AtLeastOneDigitRegex.MatchString(TrimmedPassword)
 		PasswordHasSpecialCharacter := SpecialRegex.MatchString(TrimmedPassword)
 
-
-		if (PasswordContainsLowerCase && PasswordContainsUpperCase && PasswordContainsDigit && PasswordHasSpecialCharacter){
+		if PasswordContainsLowerCase && PasswordContainsUpperCase && PasswordContainsDigit && PasswordHasSpecialCharacter {
 			return true
-		}else{
+		} else {
 			return false
 		}
-	}else{
+	} else {
 		return false
 	}
 }
 
-func ValidateEmail(Email string) bool{
+func ValidateEmail(Email string) bool {
 	TrimmedEmai := strings.TrimSpace(Email)
 	_, err := mail.ParseAddress(TrimmedEmai)
-	if err != nil{
+	if err != nil {
 		return false
-	}else{
+	} else {
 		return true
 	}
 }
 
-func HashPassword(Password string) string{
+func HashPassword(Password string) string {
 	// TODO: The password shoihuld be using a cost value from an env file.
 	HashedPassword, err := bcrypt.GenerateFromPassword([]byte(Password), bcrypt.DefaultCost)
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 
 	return string(HashedPassword)
 }
 
-func UsernameExists(Username string) bool{
+func UsernameExists(Username string) bool {
 	// TODO: Rename to UserExists
 	var user MongoConfig.User
 	TrimmedUsername := strings.TrimSpace(Username)
 	filter := bson.M{"username": TrimmedUsername}
 	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
 
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 		return false
-	}else{
+	} else {
 		return true
 	}
 }
 
-func EmailExists(Email string) bool{
+func EmailExists(Email string) bool {
 	var user MongoConfig.User
 	TrimmedEmail := strings.TrimSpace(Email)
 	filter := bson.M{"email": TrimmedEmail}
 	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
 
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 		return false
-	}else{
+	} else {
 		return true
 	}
 
 	return false
 }
 
-func UserExistsByID(UserID bson.ObjectID) bool{
+func UserExistsByID(UserID bson.ObjectID) bool {
 	var user MongoConfig.User
 	filter := bson.M{"_id": UserID}
 	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
 		return false
-	}else{
+	} else {
 		return true
 	}
 }
 
 // TODO: Move Chat functions to a seperate file
-func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool{
+func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool {
 	var chat MongoConfig.Chat
 	filter := bson.M{"creator_id": SenderID, "receiver_id": ReceiverID}
 	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&chat)
 
 	if err != nil {
 		return false
-	}else{
+	} else {
 		return true
 	}
 
 }
 
-func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID){
+func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) {
 	newChat := MongoConfig.Chat{
-		Messages: []bson.ObjectID{},
-		CreatorID: CreatorID,
-		ReceiverID: ReceiverID,
+		Messages:     []bson.ObjectID{},
+		CreatorID:    CreatorID,
+		ReceiverID:   ReceiverID,
 		CreationDate: time.Now()}
 
 	_, err := GlobalVariables.MongoChatsCollection.InsertOne(context.TODO(), newChat)
 
 	if err != nil {
 		log.Println(err)
-	}else{
+	} else {
 		log.Println("Successfully created chat between the users")
 	}
 }
 
-func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content string){
+func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content string) {
 	newMessage := MongoConfig.Message{
-		ID: bson.NewObjectID(),
-		ChatID: ChatID,
+		ID:          bson.NewObjectID(),
+		ChatID:      ChatID,
 		TextContent: Content,
-		TimeStamp: time.Now(),
-		SenderID: SenderID,
+		TimeStamp:   time.Now(),
+		SenderID:    SenderID,
 	}
 
 	_, err := GlobalVariables.MongoMessagesCollection.InsertOne(context.TODO(), newMessage)
-	if err != nil{
+	if err != nil {
 		log.Println(err)
-	}else{
+	} else {
 		AddMessageToChat(newMessage, ChatID)
 	}
 }
 
-func AddMessageToChat(Message MongoConfig.Message, ChatID bson.ObjectID){
-	var TargetChat MongoConfig.Chat;
+func AddMessageToChat(Message MongoConfig.Message, ChatID bson.ObjectID) {
+	var TargetChat MongoConfig.Chat
 	filter := bson.M{"_id": ChatID}
 	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&TargetChat)
-	if err != nil{
+	if err != nil {
 		log.Println(err)
-	}else{
+	} else {
 		UpdateQuery := bson.M{
 			"$push": bson.M{
 				"messages": Message.ID,
@@ -185,64 +186,63 @@ func AddMessageToChat(Message MongoConfig.Message, ChatID bson.ObjectID){
 		_, UpdateError := GlobalVariables.MongoChatsCollection.UpdateOne(context.TODO(), filter, UpdateQuery)
 		if UpdateError != nil {
 			log.Println(UpdateError)
-		}else{
+		} else {
 			log.Println("Message ID added to messages list for the specified Chat")
 		}
 	}
 }
 
-func RetrieveChatID(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) bson.ObjectID{
+func RetrieveChatID(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) bson.ObjectID {
 	// TODO: Make those filters bi-directional
-	var TargetChat MongoConfig.Chat;
+	var TargetChat MongoConfig.Chat
 	filter := bson.M{"creator_id": CreatorID, "receiver_id": ReceiverID}
 	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&TargetChat)
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 		return bson.NilObjectID
-	}else{
+	} else {
 		return TargetChat.ID
 	}
 }
 
-func ChatRequestSent(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool{
+func ChatRequestSent(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool {
 	// TODO: Check if the request object exists
 	filter := bson.M{"sender_id": SenderID, "receiver_id": ReceiverID}
-	var TargetRequest MongoConfig.Request;
+	var TargetRequest MongoConfig.Request
 	err := GlobalVariables.MongoRequestsCollection.FindOne(context.TODO(), filter).Decode(&TargetRequest)
 	if err != nil {
 		log.Println(err)
 		return false
-	}else{
+	} else {
 		log.Println(TargetRequest)
 		return true
 	}
 }
 
-func SendChatRequest(SenderID bson.ObjectID, ReceiverID bson.ObjectID){
+func SendChatRequest(SenderID bson.ObjectID, ReceiverID bson.ObjectID) {
 	// TODO: Create Request Object
-	if !ChatRequestSent(SenderID, ReceiverID){
+	if !ChatRequestSent(SenderID, ReceiverID) {
 		NewRequest := MongoConfig.Request{
-			SenderID : SenderID,
+			SenderID:   SenderID,
 			ReceiverID: ReceiverID,
-			Status: MongoConfig.RequestPending,
-			TimeStamp: time.Now(),
+			Status:     MongoConfig.RequestPending,
+			TimeStamp:  time.Now(),
 		}
 		_, err := GlobalVariables.MongoRequestsCollection.InsertOne(context.TODO(), NewRequest)
-		if err != nil{
+		if err != nil {
 			log.Println(err)
-		}else{
+		} else {
 			log.Println("Connection Request sent!")
 		}
-	}else{
+	} else {
 		log.Println("You have already sent this user a message request!")
 	}
 }
 
-
 func GetChatRequestStatus(SenderID bson.ObjectID, ReceiverID bson.ObjectID) MongoConfig.RequestStatus {
 
 	filter := bson.M{"sender_id": SenderID, "receiver_id": ReceiverID}
-	var TargetRequest MongoConfig.Request;
+	var TargetRequest MongoConfig.Request
 
 	err := GlobalVariables.MongoRequestsCollection.FindOne(context.TODO(), filter).Decode(&TargetRequest)
 	if err != nil {
@@ -252,8 +252,7 @@ func GetChatRequestStatus(SenderID bson.ObjectID, ReceiverID bson.ObjectID) Mong
 	return TargetRequest.Status
 }
 
-
-func AcceptChatRequest(RequestID bson.ObjectID){
+func AcceptChatRequest(RequestID bson.ObjectID) {
 	// TODO: This function shall handle a user's response to a request
 	// 1. If the request is rejected, delete all conversation and correspondingb messages with the sender
 	// 2. If the request is approved, the chat remains and the sender can send more messages than just one.
@@ -267,12 +266,12 @@ func AcceptChatRequest(RequestID bson.ObjectID){
 	}
 
 	_, err := GlobalVariables.MongoRequestsCollection.UpdateOne(context.TODO(), filter, Update)
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 	}
 }
 
-func RejectChatRequest(RequestID bson.ObjectID){
+func RejectChatRequest(RequestID bson.ObjectID) {
 	// TODO: Verify that the requesting user ID is the same as RECEIVER ID for the said request
 	filter := bson.M{"_id": RequestID}
 	Update := bson.M{
@@ -282,18 +281,18 @@ func RejectChatRequest(RequestID bson.ObjectID){
 	}
 
 	_, err := GlobalVariables.MongoRequestsCollection.UpdateOne(context.TODO(), filter, Update)
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 	}
 	// TODO: Delete the respective conversation and all associated messages upon rejection
 	DeleteRejectedRequestChat(RequestID)
 }
 
-func DeleteRejectedRequestChat(RequestID bson.ObjectID){
+func DeleteRejectedRequestChat(RequestID bson.ObjectID) {
 	var request MongoConfig.Request
-	filter :=  bson.M{"_id": RequestID}
+	filter := bson.M{"_id": RequestID}
 	err := GlobalVariables.MongoRequestsCollection.FindOne(context.TODO(), filter).Decode(&request)
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 	}
 
@@ -317,7 +316,6 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID){
 		log.Println(ChatErr)
 	}
 
-
 	messageFilter := bson.M{
 		"$or": []bson.M{
 			{"chat_id": chat.ID},
@@ -325,14 +323,14 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID){
 		},
 	}
 
-	_, MessagesErr := GlobalVariables.MongoMessagesCollection.DeleteMany( context.TODO(), messageFilter)
+	_, MessagesErr := GlobalVariables.MongoMessagesCollection.DeleteMany(context.TODO(), messageFilter)
 
 	if MessagesErr != nil {
 		log.Println(MessagesErr)
 	}
 
-	_, ChatDelErr := GlobalVariables.MongoChatsCollection.DeleteOne(context.TODO(),bson.M{"_id": chat.ID})
-	if ChatDelErr != nil{
+	_, ChatDelErr := GlobalVariables.MongoChatsCollection.DeleteOne(context.TODO(), bson.M{"_id": chat.ID})
+	if ChatDelErr != nil {
 		log.Println(ChatDelErr)
 	}
 
@@ -344,25 +342,37 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID){
 
 }
 
-func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat{
+func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat {
 	var TargetChats []MongoConfig.Chat
-	filter := bson.M{
-		"$or" : []bson.M{
-			{"sender_id": UserID},
-			{"receiver_id": UserID},
-		},
+	// TODO: Seriously consider if you don't want to denormalize the DB and store the messages directly embedded in the chat
+	matchStage := bson.D{
+		{"$match", bson.D{
+			{"$or", bson.A{
+				bson.D{{"creator_id", UserID}},
+				bson.D{{"receiver_id", UserID}},
+			}},
+		}},
 	}
 
-	cursor, err := GlobalVariables.MongoChatsCollection.Find(context.TODO(), filter)
-	if err != nil{
+	lookupStage := bson.D{
+		{"$lookup", bson.D{
+			{"from", "Messages"},
+			{"localField", "_id"},
+			{"foreignField", "chat_id"},
+			{"as", "populated_messages"},
+		}},
+	}
+
+	cursor, err := GlobalVariables.MongoChatsCollection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, lookupStage})
+	if err != nil {
 		log.Println(err)
 		return nil
-	}else{
+	} else {
 		err = cursor.All(context.TODO(), &TargetChats)
-		if err != nil{
+		if err != nil {
 			log.Println(err)
 			return nil
-		}else{
+		} else {
 			return TargetChats
 		}
 	}
