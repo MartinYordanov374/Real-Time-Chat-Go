@@ -12,7 +12,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/bson"
-	"go.mongodb.org/mongo-driver/v2/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -343,37 +342,12 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID) {
 }
 
 func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat {
-	var TargetChats []MongoConfig.Chat
-	// TODO: Seriously consider if you don't want to denormalize the DB and store the messages directly embedded in the chat
-	matchStage := bson.D{
-		{"$match", bson.D{
-			{"$or", bson.A{
-				bson.D{{"creator_id", UserID}},
-				bson.D{{"receiver_id", UserID}},
-			}},
-		}},
-	}
+	// TODO: Get rid of the lookup. Fetch the conversations. Fetch the last 50 messages only if they are not already within Redis cache.
+	// If they are not cached in Redis, cache them. Only load further messages if you need to find them. 50 per request. No lookup.
 
-	lookupStage := bson.D{
-		{"$lookup", bson.D{
-			{"from", "Messages"},
-			{"localField", "_id"},
-			{"foreignField", "chat_id"},
-			{"as", "populated_messages"},
-		}},
-	}
-
-	cursor, err := GlobalVariables.MongoChatsCollection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, lookupStage})
-	if err != nil {
-		log.Println(err)
-		return nil
-	} else {
-		err = cursor.All(context.TODO(), &TargetChats)
-		if err != nil {
-			log.Println(err)
-			return nil
-		} else {
-			return TargetChats
-		}
-	}
+	// 1. Find all chats where UserID is either sender or creator
+	// 2. Check if messages with the corersponding Chat IDs are already cached in Redis
+	// 3. If not, fetch the mongoDB for the last 100 messages and stores them in Redis.
+	// 4. If the users scrolls up to the 100th message, fetch the next 100 messages from and store them in Redis.
+	// 5. Redis shall contain no more than 100 of the latest messages.
 }
