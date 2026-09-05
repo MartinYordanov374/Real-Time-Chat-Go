@@ -328,6 +328,7 @@ func CacheMessageRedis(Message MongoConfig.Message){
 	pipeline := Redis.Client.Pipeline()
 	pipeline.LPush(context.TODO(), key, MarshaledMessage)
 	pipeline.LTrim(context.TODO(), key, 0, 49)
+	pipeline.Expire(context.TODO(), key, 1*time.Hour)
 
 	_, err = pipeline.Exec(context.TODO())
 	if err != nil {
