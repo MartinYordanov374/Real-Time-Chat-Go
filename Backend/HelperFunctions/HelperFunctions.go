@@ -12,6 +12,7 @@ import (
 	"RealTimeChatApp/Backend/Redis"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 	"encoding/json"
 )
@@ -344,9 +345,11 @@ func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error){
 	}
 
 	if len(msgs) == 0{
-		// TODO: Fetch the DB later
-		FetchLatestMessagesFromDB(ChatID)
-		return []MongoConfig.Message{}, nil
+		DBMessages, err := FetchLatestMessagesFromDB(ChatID)
+		if err != nil{
+			return nil, err
+		}
+		return DBMessages, nil
 	}
 
 	TargetMessages := make([]MongoConfig.Message, 0, len(msgs))
@@ -394,11 +397,31 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat{
 	return TargetChats
 }
 
-func FetchLatestMessagesFromDB(ChatID bson.ObjectID){
+func FetchLatestMessagesFromDB(ChatID bson.ObjectID) ([]MongoConfig.Message, error){
 	// TODO: Fetch the latest 50 messages from the DB, cache them and return to user
 	// NOTE: This function will also be used if the user scrolls beyond the cached messages.
 	// A cursor will be needed for that purpose pointing to the latest message that the user has seen in the chat.
-	filter := bson.M{"ChatID":ChatID}
-	MessagesAmount := 50
+	filter := bson.M{"chat_id": ChatID}
+	opts := options.Find().SetLimit(50)
+
+	var TargetMessages []MongoConfig.Message
+
+	cursor, err := GlobalVariables.MongoMessagesCollection.Find(context.TODO(), filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+
+	err = cursor.All(context.TODO(), &TargetMessages)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, Message := range TargetMessages{
+		CacheMessageRedis(Message)
+	}
+
+	return TargetMessages, nil
 
 }
