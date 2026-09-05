@@ -323,7 +323,7 @@ func CacheMessageRedis(Message MongoConfig.Message){
 		log.Println(err)
 		return
 	}
-
+	// TODO: Expire the stored messages after, say, 12 h
 	pipeline := Redis.Client.Pipeline()
 	pipeline.LPush(context.TODO(), key, MarshaledMessage)
 	pipeline.LTrim(context.TODO(), key, 0, 99)
@@ -332,33 +332,74 @@ func CacheMessageRedis(Message MongoConfig.Message){
 	if err != nil {
 		log.Println(err)
 	}
-
-	GetCachedMessages(Message.ChatID)
 }
 
-func GetCachedMessages(ChatID bson.ObjectID) []string{
-	// TODO: Implement this function so that it can bhe used to retrieve cached messages
+func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error){
 	// TODO: If the messages do not exist in cache,
 	// then fetch them from DB and save them via CacheMessageRedis
 	key := "chat:"+ChatID.Hex()+":messages"
-
 	msgs, err := Redis.Client.LRange(context.TODO(), key, 0, 99).Result()
 
 	if err != nil{
 		log.Println(err)
-		return []string{}
+		// NOTE: This should work because if a conversation between users exist, then it should have at least one message given that nobody deleted the original message
+		return nil, err
 	}
-	return msgs
+
+	if len(msgs) == 0{
+		// TODO: Fetch the DB later
+		return []MongoConfig.Message{}, nil
+	}
+
+	TargetMessages := make([]MongoConfig.Message, 0, len(msgs))
+	for _, Message := range msgs {
+		var TargetMessage MongoConfig.Message
+		err := json.Unmarshal([]byte(Message), &TargetMessage)
+		if err != nil {
+			continue
+		}
+		TargetMessages = append(TargetMessages, TargetMessage)
+	}
+	return TargetMessages, nil
 }
 
 
-//func RetrieveAllUserChats(UserID bson.ObjectID) {
+func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat{
 	// TODO: Get rid of the lookup. Fetch the conversations. Fetch the last 50 messages only if they are not already within Redis cache.
 	// If they are not cached in Redis, cache them. Only load further messages if you need to find them. 50 per request. No lookup.
 
 	// 1. Find all chats where UserID is either sender or creator
+	var TargetChats []MongoConfig.Chat
+	UserChatsFilter := bson.M{
+		"$or": []bson.M{
+			{"creator_id": UserID},
+			{"receiver_id": UserID},
+		}}
+
+	cursor, err := GlobalVariables.MongoChatsCollection.Find(context.TODO(), UserChatsFilter)
+
+	if err != nil {
+		log.Println(err)
+	}
+	defer cursor.Close(context.TODO())
+
+	err = cursor.All(context.TODO(), &TargetChats)
+	if err != nil{
+		log.Println(err)
+	}
+	// Retrieving Messages
+	for _, TargetChat := range TargetChats{
+		res, err := GetCachedMessages(TargetChat.ID)
+		if err != nil {
+			log.Println(err)
+		}
+
+		log.Println(res)
+	}
+
+	return TargetChats
 	// 2. Check if messages with the corersponding Chat IDs are already cached in Redis
 	// 3. If not, fetch the mongoDB for the last 100 messages and stores them in Redis.
 	// 4. If the users scrolls up to the 100th message, fetch the next 100 messages from and store them in Redis.
 	// 5. Redis shall contain no more than 100 of the latest messages.
-//}
+}

@@ -206,8 +206,8 @@ func RetrieveChat(GinContext *gin.Context){
 }
 
 //TODO: implement function that fetches all chats that a user is a member of
-
-/*func RetrieveAllUserChats(GinContext *gin.Context){
+//
+func RetrieveAllUserChats(GinContext *gin.Context){
 	// 1. Retrieve user ID from session Cookie
 	SessionCookie, err := GinContext.Cookie("SessionID")
 	RedisSession, err := Redis.Client.Get(context.TODO(), SessionCookie).Result()
@@ -231,4 +231,4 @@ func RetrieveChat(GinContext *gin.Context){
 
 	TargetChats := HelperFunctions.RetrieveAllUserChats(SessionData.UserID)
 	GinContext.JSON(200, gin.H{"chats":TargetChats})
-    }*/
+}
