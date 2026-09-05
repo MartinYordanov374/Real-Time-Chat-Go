@@ -1,61 +1,34 @@
+"use client"
 import React from 'react'
 import MessageBox from '../MessageBox/MessageBox'
+import Axios from 'axios'
+import {useState, useEffect} from 'react'
 
+// TODO: Add backend check whether the sender user ID matches the current user ID, if yes then sender = true, otherwise sender = false
 type message ={
     id: number,
-    content: string
+    textContent: string
+    senderId: string,
     sender: boolean,
 }
-export default function ChatBox() {
-    let online : boolean = true
-    let isChatSelected : boolean = false
-    let Messages : message[] = [{
-        id: 1,
-        content: "test 1",
-        sender: true,
-    },
-    {
-        id: 2,
-        content: "test 2",
-        sender: false,
-    },
-    {
-        id: 3,
-        content: "test 3",
-        sender: false,
-    },
-    {
-        id: 4,
-        content: "test 4",
-        sender: true,
-    },
-    {
-        id: 5,
-        content: "test 5",
-        sender: false
-    },
-    {
-        id: 6,
-        content: "test 6",
-        sender: true
-    },
-    {
-        id: 7,
-        content: "test 7",
-        sender: true
-    },
-    {
-        id: 8,
-        content: "test 8",
-        sender: true
-    },
-    {
-        id: 9,
-        content: "test 9",
-        sender: true
-    }]
+export default function ChatBox({chatID}) {
+  let online : boolean = true
+  const [Messages, SetMessages] = useState([])
+   useEffect(()=> {
+        async function FetchChatMessages(chatID){
+            let ChatMessages = await Axios.get(`http://localhost:8080/RetrieveChat/${chatID}`, {withCredentials: true})
+            .then((res) => {
+                SetMessages(res.data.messages)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+        }
+
+        FetchChatMessages(chatID)
+   }, [chatID])
   return (
-    isChatSelected == false ?
+    chatID == undefined ?
     <div className="flex h-screen flex-col w-full bg-gray-100">
         <div className='flex flex-1 justify-center items-center'>Start or select a chat and it will appear here</div>
     </div>
@@ -77,8 +50,8 @@ export default function ChatBox() {
             {Messages.map((message) => (
                 <MessageBox 
                 key ={message.id}
-                content={message.content}
-                sender={message.sender}/>
+                content={message.textContent}
+                sender={message.senderId}/>
             ))}
         </div>
         <div className='sticky bottom-0 bg-white p-4 gap-2'>

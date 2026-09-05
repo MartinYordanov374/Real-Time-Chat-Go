@@ -201,8 +201,17 @@ func InviteUserToGroupChat(GinContext *gin.Context){
 }
 
 func RetrieveChat(GinContext *gin.Context){
-	// TODO: This function shall fetch the chat between the requesting user and the specified user.
-	// TODO: Retrieve the most recent, i.e., 50 or 100 messages from the chat from Redis if available
+	// TODO: Make sure that the user fetching this is a member of the chat
+	ChatID, err := bson.ObjectIDFromHex(GinContext.Param("ChatID"))
+	if err != nil {
+		log.Println(err)
+	}
+	messages, err := HelperFunctions.GetCachedMessages(ChatID)
+	if err != nil{
+		GinContext.JSON(500, gin.H{"error": err})
+	}
+
+	GinContext.JSON(200, gin.H{"messages": messages})
 }
 
 //TODO: implement function that fetches all chats that a user is a member of

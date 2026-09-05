@@ -1,18 +1,9 @@
 import React from 'react'
 
-export default function ChatList({props}) {
+export default function ChatList({chats, onSelect}) {
   // TODO: Make it so that the chat box shows the ID corresponding to the user on the other end of the chat, 
   // i.e., if User A is retrieving the chats, they shall see user B in the contacts list
-  const contacts = [{
-    Username: "John Doe",
-    LastMessage: "This is the last message from john doe",
-    LastMessageDate: "Friday"
-  },
-  {
-    Username: "The real John Doe",
-    LastMessage: "This is the last message from THE REAL john doe and he is not playing games!",
-    LastMessageDate: "12:15 PM"
-  }]
+
   return (
     <div className="justify-left w-[50%] bg-white text-gray-900">
       {/* TODO: Populate the user header with data about the current user */}
@@ -33,8 +24,8 @@ export default function ChatList({props}) {
       </div>
       {/* TODO: List all of the chats that the user is a member of. Populate the data accordingly. */}
       {/* 3. Contacts List */}
-      {props.map((Chat) => (
-        <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer'>
+      {chats.map((Chat) => (
+        <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer' onClick={() => onSelect(Chat.id)}>
           <div className='flex'>
             <div className=' flex size-12 rounded-full bg-blue-500 p-2 justify-center items-center'>
               PFP
