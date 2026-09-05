@@ -399,9 +399,8 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat{
 }
 
 func FetchLatestMessagesFromDB(ChatID bson.ObjectID) ([]MongoConfig.Message, error){
-	// TODO: Fetch the latest 50 messages from the DB, cache them and return to user
-	// NOTE: This function will also be used if the user scrolls beyond the cached messages.
-	// A cursor will be needed for that purpose pointing to the latest message that the user has seen in the chat.
+	// TODO: This function will also be used if the user scrolls beyond the cached messages.
+	// NOTE: A cursor will be needed for that purpose pointing to the latest message that the user has seen in the chat.
 	filter := bson.M{"chat_id": ChatID}
 	opts := options.Find().SetLimit(50)
 
