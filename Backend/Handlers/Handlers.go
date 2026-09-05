@@ -142,8 +142,8 @@ func SendMessage(GinContext *gin.Context){
 						RequestStatus := HelperFunctions.GetChatRequestStatus(SenderID, ConvertedReceiverID)
 						if RequestStatus == MongoConfig.RequestAccepted{
 							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
-							HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
-							HelperFunctions.CacheMessageRedis(CurrentChatID, RequestBody.TextContent)
+							MessageObject := HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
+							HelperFunctions.CacheMessageRedis(MessageObject)
 							RedisMessage := GlobalVariables.RedisMessage{ConvertedReceiverID, RequestBody.TextContent}
 							MarshaledData, err := json.Marshal(RedisMessage)
 							if err != nil {
