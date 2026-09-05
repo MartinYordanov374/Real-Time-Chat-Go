@@ -9,10 +9,11 @@ import (
 	"regexp"
 	"strings"
 	"time"
-
+	"RealTimeChatApp/Backend/Redis"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"golang.org/x/crypto/bcrypt"
+	"encoding/json"
 )
 
 func SetSessionCookie(GinContext *gin.Context, SessionID string) {
@@ -315,12 +316,40 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID) {
 
 func CacheMessageRedis(Message MongoConfig.Message){
 	// TODO: If a message gets edited or deleted, the cache for the said conversation should be destroyed entireloy
+	key := "chat:"+Message.ChatID.Hex()+":messages"
+
+	MarshaledMessage, err := json.Marshal(Message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	pipeline := Redis.Client.Pipeline()
+	pipeline.LPush(context.TODO(), key, MarshaledMessage)
+	pipeline.LTrim(context.TODO(), key, 0, 99)
+
+	_, err = pipeline.Exec(context.TODO())
+	if err != nil {
+		log.Println(err)
+	}
+
+	GetCachedMessages(Message.ChatID)
 }
 
 func GetCachedMessages(ChatID bson.ObjectID){
 	// TODO: Implement this function so that it can bhe used to retrieve cached messages
 	// TODO: If the messages do not exist in cache,
 	// then fetch them from DB and save them via CacheMessageRedis
+	key := "chat:"+ChatID.Hex()+":messages"
+
+	msgs, err := Redis.Client.LRange(context.TODO(), key, 0, 99).Result()
+
+	if err != nil{
+		log.Println(err)
+		return
+	}
+
+	log.Println(msgs)
 }
 
 
