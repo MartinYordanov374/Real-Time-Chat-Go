@@ -336,7 +336,7 @@ func CacheMessageRedis(Message MongoConfig.Message){
 	GetCachedMessages(Message.ChatID)
 }
 
-func GetCachedMessages(ChatID bson.ObjectID){
+func GetCachedMessages(ChatID bson.ObjectID) []string{
 	// TODO: Implement this function so that it can bhe used to retrieve cached messages
 	// TODO: If the messages do not exist in cache,
 	// then fetch them from DB and save them via CacheMessageRedis
@@ -346,10 +346,9 @@ func GetCachedMessages(ChatID bson.ObjectID){
 
 	if err != nil{
 		log.Println(err)
-		return
+		return []string{}
 	}
-
-	log.Println(msgs)
+	return msgs
 }
 
 
