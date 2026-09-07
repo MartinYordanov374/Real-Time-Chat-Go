@@ -209,8 +209,8 @@ func RetrieveChat(GinContext *gin.Context) {
 	messages, err := HelperFunctions.GetCachedMessages(ChatID)
 	if err != nil {
 		GinContext.JSON(500, gin.H{"error": err})
+		return
 	}
-
 	GinContext.JSON(200, gin.H{"messages": messages})
 }
 

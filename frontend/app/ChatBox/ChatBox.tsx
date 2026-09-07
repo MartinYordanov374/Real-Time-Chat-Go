@@ -11,25 +11,13 @@ type message ={
     senderId: string,
     sender: boolean,
 }
-export default function ChatBox({chatID}) {
+export default function ChatBox({chat}) {
   let online : boolean = true
-  const [Messages, SetMessages] = useState([])
-   useEffect(()=> {
-        async function FetchChatMessages(chatID){
-            let ChatMessages = await Axios.get(`http://localhost:8080/RetrieveChat/${chatID}`, {withCredentials: true})
-            .then((res) => {
-                SetMessages(res.data.messages)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-        }
-
-        FetchChatMessages(chatID)
-   }, [chatID])
+  console.log(chat)
+  // TODO: Figure out how to get the other username without additional queries
 
   return (
-    chatID == undefined ?
+    chat == undefined ?
     <div className="flex h-screen flex-col w-full bg-gray-100">
         <div className='flex flex-1 justify-center items-center'>Start or select a chat and it will appear here</div>
     </div>
@@ -38,7 +26,7 @@ export default function ChatBox({chatID}) {
         <div className='sticky top-0 bg-white flex p-4'>
             <div className='flex size-12 rounded-full bg-blue-500 p-4 justify-center items-center'>PFP</div>
             <div className='flex-col'>
-                <h2 className='text-gray-900 pl-4'>Username</h2>
+                <h2 className='text-gray-900 pl-4'>{chat.DisplayedUsername}</h2>
                 {online 
                     ?
                     <p className='text-emerald-500 font-bold pl-4 pb-4'> Online </p>
@@ -48,7 +36,7 @@ export default function ChatBox({chatID}) {
             </div>
         </div>
         <div className='flex flex-col-reverse max-w h-screen p-10 max-h-screen overflow-scroll'>
-            {Messages.map((message) => (
+            {chat.messages.map((message) => (
                 <MessageBox 
                 key ={message.id}
                 content={message.textContent}

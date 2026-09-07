@@ -7,7 +7,7 @@ export default function page() {
   // TODO: First fetch the chats and then load the page to ensure no issues with the page loading before the chats are retrieved occur
   const [chats, setChats] = useState()
   const [loading, setLoading] = useState(true)
-  const [selectedChatID, setSelectedChatID] = useState(undefined)
+  const [selectedChat, setSelectedChat] = useState(undefined)
   const [currentUsername, setCurrentUsername] = useState('')
   useEffect(() => {
     async function RetrieveUserChats(){
@@ -38,10 +38,10 @@ export default function page() {
     loading == false ?
     <div className="flex">
         {/* TODO: Send the chats list to the chat list component and populate the contacts page with the chats */}
-        <ChatList chats = {chats} onSelect={setSelectedChatID} currentUsername={currentUsername}/>
+        <ChatList chats = {chats} onSelect={setSelectedChat} currentUsername={currentUsername}/>
         {/* TODO: Selecting a contact from the chat list 
         will open the chat box with the corresponding conversation */}
-        <ChatBox chatID = {selectedChatID}/>
+        <ChatBox chat = {selectedChat}/>
     </div>
     :
     <div>
