@@ -2,128 +2,16 @@ package HelperFunctions
 
 import (
 	"RealTimeChatApp/Backend/GlobalVariables"
-	"RealTimeChatApp/Backend/Mongo"
+	MongoConfig "RealTimeChatApp/Backend/Mongo"
 	"context"
 	"log"
-	"net/mail"
-	"regexp"
-	"strings"
-	"time"
-	"RealTimeChatApp/Backend/Redis"
-	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/bson"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
-	"golang.org/x/crypto/bcrypt"
+	"RealTimeChatApp/Backend/Redis"
 	"encoding/json"
+	"time"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-func SetSessionCookie(GinContext *gin.Context, SessionID string) {
-	GinContext.SetCookie("SessionID", SessionID, GlobalVariables.CookieExpirationSeconds, "/", "localhost", false, false)
-}
-
-func ValidateUsername(Username string) bool {
-	TrimmedUsername := strings.TrimSpace(Username)
-	if len(TrimmedUsername) >= 2 {
-		UsernameRegex, _ := regexp.Compile("^[a-zA-Z]{2,}$")
-
-		ValidUsername := UsernameRegex.MatchString(TrimmedUsername)
-		if ValidUsername {
-			return true
-		} else {
-			return false
-		}
-	} else {
-		return false
-	}
-}
-
-func ValidatePassword(Password string) bool {
-	// TODO: Move all regexes to a seperate file
-	TrimmedPassword := strings.TrimSpace(Password)
-	if len(TrimmedPassword) >= 15 {
-		AtLeastOneLowerCaseRegex := regexp.MustCompile(`[a-z]`)
-		AtLeastOneUpperCaseRegex := regexp.MustCompile(`[A-Z]`)
-		AtLeastOneDigitRegex := regexp.MustCompile(`[\\d]`)
-		SpecialRegex := regexp.MustCompile(`[^a-zA-Z0-9]`)
-
-		PasswordContainsLowerCase := AtLeastOneLowerCaseRegex.MatchString(TrimmedPassword)
-		PasswordContainsUpperCase := AtLeastOneUpperCaseRegex.MatchString(TrimmedPassword)
-		PasswordContainsDigit := AtLeastOneDigitRegex.MatchString(TrimmedPassword)
-		PasswordHasSpecialCharacter := SpecialRegex.MatchString(TrimmedPassword)
-
-		if PasswordContainsLowerCase && PasswordContainsUpperCase && PasswordContainsDigit && PasswordHasSpecialCharacter {
-			return true
-		} else {
-			return false
-		}
-	} else {
-		return false
-	}
-}
-
-func ValidateEmail(Email string) bool {
-	TrimmedEmai := strings.TrimSpace(Email)
-	_, err := mail.ParseAddress(TrimmedEmai)
-	if err != nil {
-		return false
-	} else {
-		return true
-	}
-}
-
-func HashPassword(Password string) string {
-	// TODO: The password shoihuld be using a cost value from an env file.
-	HashedPassword, err := bcrypt.GenerateFromPassword([]byte(Password), bcrypt.DefaultCost)
-	if err != nil {
-		panic(err)
-	}
-
-	return string(HashedPassword)
-}
-
-func UsernameExists(Username string) bool {
-	// TODO: Rename to UserExists
-	var user MongoConfig.User
-	TrimmedUsername := strings.TrimSpace(Username)
-	filter := bson.M{"username": TrimmedUsername}
-	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
-
-	if err != nil {
-		log.Println(err)
-		return false
-	} else {
-		return true
-	}
-}
-
-func EmailExists(Email string) bool {
-	var user MongoConfig.User
-	TrimmedEmail := strings.TrimSpace(Email)
-	filter := bson.M{"email": TrimmedEmail}
-	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
-
-	if err != nil {
-		log.Println(err)
-		return false
-	} else {
-		return true
-	}
-
-	return false
-}
-
-func UserExistsByID(UserID bson.ObjectID) bool {
-	var user MongoConfig.User
-	filter := bson.M{"_id": UserID}
-	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
-	if err != nil {
-		return false
-	} else {
-		return true
-	}
-}
-
-// TODO: Move Chat functions to a seperate file
 func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool {
 	var chat MongoConfig.Chat
 	filter := bson.M{"creator_id": SenderID, "receiver_id": ReceiverID}
@@ -315,9 +203,9 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID) {
 
 }
 
-func CacheMessageRedis(Message MongoConfig.Message){
+func CacheMessageRedis(Message MongoConfig.Message) {
 	// TODO: If a message gets edited or deleted, the cache for the said conversation should be destroyed entireloy
-	key := "chat:"+Message.ChatID.Hex()+":messages"
+	key := "chat:" + Message.ChatID.Hex() + ":messages"
 
 	MarshaledMessage, err := json.Marshal(Message)
 	if err != nil {
@@ -336,18 +224,18 @@ func CacheMessageRedis(Message MongoConfig.Message){
 	}
 }
 
-func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error){
-	key := "chat:"+ChatID.Hex()+":messages"
+func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error) {
+	key := "chat:" + ChatID.Hex() + ":messages"
 	msgs, err := Redis.Client.LRange(context.TODO(), key, 0, 49).Result()
 
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
 
-	if len(msgs) == 0{
+	if len(msgs) == 0 {
 		DBMessages, err := FetchLatestMessagesFromDB(ChatID)
-		if err != nil{
+		if err != nil {
 			return nil, err
 		}
 		return DBMessages, nil
@@ -365,8 +253,7 @@ func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error){
 	return TargetMessages, nil
 }
 
-
-func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat{
+func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat {
 	var TargetChats []MongoConfig.Chat
 	UserChatsFilter := bson.M{
 		"$or": []bson.M{
@@ -382,11 +269,11 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat{
 	defer cursor.Close(context.TODO())
 
 	err = cursor.All(context.TODO(), &TargetChats)
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 	}
 	// Retrieving Messages
-	for idx, TargetChat := range TargetChats{
+	for idx, TargetChat := range TargetChats {
 		res, err := GetCachedMessages(TargetChat.ID)
 		if err != nil {
 			log.Println(err)
@@ -398,7 +285,7 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat{
 	return TargetChats
 }
 
-func FetchLatestMessagesFromDB(ChatID bson.ObjectID) ([]MongoConfig.Message, error){
+func FetchLatestMessagesFromDB(ChatID bson.ObjectID) ([]MongoConfig.Message, error) {
 	// TODO: This function will also be used if the user scrolls beyond the cached messages.
 	// NOTE: A cursor will be needed for that purpose pointing to the latest message that the user has seen in the chat.
 	filter := bson.M{"chat_id": ChatID}
@@ -418,7 +305,7 @@ func FetchLatestMessagesFromDB(ChatID bson.ObjectID) ([]MongoConfig.Message, err
 		return nil, err
 	}
 
-	for _, Message := range TargetMessages{
+	for _, Message := range TargetMessages {
 		CacheMessageRedis(Message)
 	}
 
