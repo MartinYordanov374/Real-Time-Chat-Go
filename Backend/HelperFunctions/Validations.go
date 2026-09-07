@@ -117,3 +117,14 @@ func UserExistsByID(UserID bson.ObjectID) bool {
 		return true
 	}
 }
+
+func GetUserData(UserID bson.ObjectID) (string, error) {
+	var user MongoConfig.User
+	filter := bson.M{"_id": UserID}
+	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		return "", err
+	}
+
+	return user.Username, nil
+}

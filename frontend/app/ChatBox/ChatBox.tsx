@@ -27,6 +27,7 @@ export default function ChatBox({chatID}) {
 
         FetchChatMessages(chatID)
    }, [chatID])
+
   return (
     chatID == undefined ?
     <div className="flex h-screen flex-col w-full bg-gray-100">

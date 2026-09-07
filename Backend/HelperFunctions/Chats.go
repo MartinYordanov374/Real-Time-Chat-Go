@@ -3,12 +3,13 @@ package HelperFunctions
 import (
 	"RealTimeChatApp/Backend/GlobalVariables"
 	MongoConfig "RealTimeChatApp/Backend/Mongo"
-	"context"
-	"log"
-	"go.mongodb.org/mongo-driver/v2/bson"
 	"RealTimeChatApp/Backend/Redis"
+	"context"
 	"encoding/json"
+	"log"
 	"time"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
@@ -278,7 +279,6 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat {
 		if err != nil {
 			log.Println(err)
 		}
-		log.Println(res)
 		TargetChats[idx].Messages = res
 	}
 

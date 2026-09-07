@@ -1,14 +1,15 @@
 package main
 
-import(
-	"github.com/gin-gonic/gin"
-	"RealTimeChatApp/Backend/Handlers"
-	"RealTimeChatApp/Backend/Mongo"
+import (
+	HandlerFunctions "RealTimeChatApp/Backend/Handlers"
 	"RealTimeChatApp/Backend/Middlewares"
+	MongoConfig "RealTimeChatApp/Backend/Mongo"
 	"RealTimeChatApp/Backend/WebSockets"
+
+	"github.com/gin-gonic/gin"
 )
 
-func main(){
+func main() {
 
 	MongoConfig.ConnectToMongo()
 
@@ -34,5 +35,7 @@ func main(){
 	router.GET("/ws", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), WebSocketsHandler.HandleWebSocketConnection)
 
 	router.GET("/GetAllChats", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.RetrieveAllUserChats)
+	router.GET("/GetCurrentUserData", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.GetCurrentUserData)
+
 	router.Run()
 }
