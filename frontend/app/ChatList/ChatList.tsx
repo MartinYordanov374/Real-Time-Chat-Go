@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function ChatList({chats, onSelect}) {
+export default function ChatList({chats, onSelect, currentUsername}) {
   // TODO: Make it so that the chat box shows the ID corresponding to the user on the other end of the chat, 
   // i.e., if User A is retrieving the chats, they shall see user B in the contacts list
 
@@ -11,7 +11,7 @@ export default function ChatList({chats, onSelect}) {
       <div className='flex shadow-xs p-4'>
         <div className='flex flex-col size-12 rounded-full bg-blue-500 p-2 justify-center items-center'>PFP</div>
         <div className='pl-4 flex flex-col'>
-          <span className='font-bold'>Username</span>
+          <span className='font-bold'>{currentUsername}</span>
           <span className='text-sm text-gray-400 pt-0'>Online</span>
         </div>
       </div>  

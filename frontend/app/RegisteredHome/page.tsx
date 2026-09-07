@@ -8,18 +8,28 @@ export default function page() {
   const [chats, setChats] = useState()
   const [loading, setLoading] = useState(true)
   const [selectedChatID, setSelectedChatID] = useState(undefined)
-
+  const [currentUsername, setCurrentUsername] = useState('')
   useEffect(() => {
     async function RetrieveUserChats(){
       let AllCurrentUserChats = await Axios.get('http://localhost:8080/GetAllChats', {withCredentials: true})
       .then((res) =>{
         setChats(res.data?.chats)
-        console.log(chats)
-        setLoading(false)
+        RetrieveCurrentUsername()
       })
       .catch((err) => {
         console.log(err)
       })
+    }
+
+    async function RetrieveCurrentUsername(){
+        let CurrentUsername = await Axios.get('http://localhost:8080/GetCurrentUserData', {withCredentials: true})
+        .then((res) =>{
+          setCurrentUsername(res.data.User)
+          setLoading(false)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     }
     RetrieveUserChats()
   }, [])
@@ -28,7 +38,7 @@ export default function page() {
     loading == false ?
     <div className="flex">
         {/* TODO: Send the chats list to the chat list component and populate the contacts page with the chats */}
-        <ChatList chats = {chats} onSelect={setSelectedChatID}/>
+        <ChatList chats = {chats} onSelect={setSelectedChatID} currentUsername={currentUsername}/>
         {/* TODO: Selecting a contact from the chat list 
         will open the chat box with the corresponding conversation */}
         <ChatBox chatID = {selectedChatID}/>
