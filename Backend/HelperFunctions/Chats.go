@@ -280,6 +280,24 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat {
 			log.Println(err)
 		}
 		TargetChats[idx].Messages = res
+		// TODO: Try to find a more optimal way to get the username without look ups or changing any of the structs
+		if TargetChat.CreatorID == UserID {
+			DisplayedUserID := TargetChat.ReceiverID
+			DisplayedUsername, err := GetUserData(DisplayedUserID)
+			if err != nil {
+				panic(err)
+			} else {
+				TargetChats[idx].DisplayedUsername = DisplayedUsername
+			}
+		} else {
+			DisplayedUserID := TargetChat.CreatorID
+			DisplayedUsername, err := GetUserData(DisplayedUserID)
+			if err != nil {
+				panic(err)
+			} else {
+				TargetChats[idx].DisplayedUsername = DisplayedUsername
+			}
+		}
 	}
 
 	return TargetChats

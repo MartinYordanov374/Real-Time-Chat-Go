@@ -14,11 +14,12 @@ type User struct {
 }
 
 type Chat struct {
-	ID           bson.ObjectID `json:"id" bson:"_id,omitempty"`
-	CreatorID    bson.ObjectID `json:"creatorId" bson:"creator_id"`
-	ReceiverID   bson.ObjectID `json:"receiverId" bson:"receiver_id"`
-	CreationDate time.Time     `json:"creationDate" bson:"creation_date"`
-	Messages 	[]Message		`json:"messages" bson:"messages"`
+	ID                bson.ObjectID `json:"id" bson:"_id,omitempty"`
+	CreatorID         bson.ObjectID `json:"creatorId" bson:"creator_id"`
+	ReceiverID        bson.ObjectID `json:"receiverId" bson:"receiver_id"`
+	CreationDate      time.Time     `json:"creationDate" bson:"creation_date"`
+	Messages          []Message     `json:"messages" bson:"messages"`
+	DisplayedUsername string        `json:"DisplayedUsername" bson:"DisplayedUsername"`
 }
 
 type Message struct {

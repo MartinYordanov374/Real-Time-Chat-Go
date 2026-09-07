@@ -30,7 +30,7 @@ export default function ChatList({chats, onSelect, currentUsername}) {
             <div className=' flex size-12 rounded-full bg-blue-500 p-2 justify-center items-center'>
               PFP
             </div>
-            <h2 className='font-semibold pl-2'>{Chat.creatorId}</h2>
+            <h2 className='font-semibold pl-2'>{Chat.DisplayedUsername}</h2>
             {/* TODO: for mobile resolutions, move the timestamp under the message*/}
             <p className='ml-auto text-gray-400 text-sm'>{Chat.messages[0].timeStamp}</p>
           </div>
