@@ -1,21 +1,22 @@
 package WebSockets
 
 import (
+	"RealTimeChatApp/Backend/GlobalVariables"
+	"RealTimeChatApp/Backend/Redis"
+	"context"
+	"encoding/json"
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"net/http"
-	"log"
 	"go.mongodb.org/mongo-driver/v2/bson"
-	"context"
-	"RealTimeChatApp/Backend/Redis"
-	"RealTimeChatApp/Backend/GlobalVariables"
-	"encoding/json"
 )
 
 var ConnectionUpgrader = websocket.Upgrader{
-	ReadBufferSize: 1024,
+	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	CheckOrigin: func(*http.Request) bool{
+	CheckOrigin: func(*http.Request) bool {
 		return true
 	},
 }
@@ -24,13 +25,13 @@ type Handler struct {
 	Hub *Hub
 }
 
-func CreateHandler(Hub *Hub) *Handler{
+func CreateHandler(Hub *Hub) *Handler {
 	return &Handler{
 		Hub: Hub,
 	}
 }
 
-func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
+func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context) {
 	SocketConnection, err := ConnectionUpgrader.Upgrade(GinContext.Writer, GinContext.Request, nil)
 	if err != nil {
 		log.Println("Connection upgrade error: ", err)
@@ -47,8 +48,8 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
 
 	UserID := ContextValue.(bson.ObjectID)
 	Client := &Client{
-		UserID: UserID,
-		Connection: SocketConnection,
+		UserID:      UserID,
+		Connection:  SocketConnection,
 		SendChannel: make(chan []byte),
 	}
 
@@ -66,7 +67,7 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
 
 		var PayloadData GlobalVariables.RedisMessage
 		err = json.Unmarshal([]byte(msg.Payload), &PayloadData)
-		if err != nil{
+		if err != nil {
 			log.Println(err)
 		}
 		// TODO: Consider what happens when the user is offline when they are sent a message
@@ -81,11 +82,11 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context){
 	}
 }
 
-func (Client *Client) WritePump(){
-	for{
+func (Client *Client) WritePump() {
+	for {
 		msg := <-Client.SendChannel
-		err := Client.Connection.WriteMessage(websocket.TextMessage,msg)
-		if err != nil{
+		err := Client.Connection.WriteMessage(websocket.TextMessage, msg)
+		if err != nil {
 			log.Println("An error occurred")
 			log.Println(err)
 		}
@@ -93,15 +94,16 @@ func (Client *Client) WritePump(){
 	}
 }
 
-func (Client *Client) ReadPump(){
+func (Client *Client) ReadPump() {
 	// TODO: Implement the Read Pump
 	// Its purpose is to take notice of any user changes, i.e., disconnected, is typing, etc.
 }
 
-func SendMessageToClient(Hub *Hub, ReceiverID bson.ObjectID, Message string){
-	for client := range Hub.ActiveClients{
-		if client.UserID == ReceiverID{
+func SendMessageToClient(Hub *Hub, ReceiverID bson.ObjectID, Message string) {
+	for client := range Hub.ActiveClients {
+		if client.UserID == ReceiverID {
 			client.SendChannel <- []byte(Message)
 		}
+		// TODO: Also publish the message to the sender's channel!
 	}
 }

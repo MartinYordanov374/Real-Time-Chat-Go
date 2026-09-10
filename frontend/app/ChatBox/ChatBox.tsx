@@ -2,20 +2,27 @@
 import React from 'react'
 import MessageBox from '../MessageBox/MessageBox'
 import Axios from 'axios'
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 
-// TODO: Add backend check whether the sender user ID matches the current user ID, if yes then sender = true, otherwise sender = false
-type message ={
-    id: number,
-    textContent: string
-    senderId: string,
-    sender: boolean,
-}
+
 export default function ChatBox({chat}) {
   let online : boolean = true
-  console.log(chat)
-  // TODO: Figure out how to get the other username without additional queries
+  const [message, setMessage] = useState('')
+  const [chatMessages, setChatMessages] = useState([])
+  useEffect(() => {
+    setChatMessages(chat?.messages ?? [])
+  }, [chat])
 
+  // TODO: Establish socket connection here and add the message to the chatMessages list
+  async function SendMessage(){
+    let res = await Axios.post(`http://localhost:8080/SendMessage/${chat.receiverId}`, {"TextContent": message}, {withCredentials: true})
+    .then((res) => {
+        console.log(res)
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+  }
   return (
     chat == undefined ?
     <div className="flex h-screen flex-col w-full bg-gray-100">
@@ -36,9 +43,8 @@ export default function ChatBox({chat}) {
             </div>
         </div>
         <div className='flex flex-col-reverse max-w h-screen p-10 max-h-screen overflow-scroll'>
-            {chat.messages.map((message) => (
+            {chatMessages.map((message) => (
                 <MessageBox 
-                key ={message.id}
                 content={message.textContent}
                 sender={message.senderId}/>
             ))}
@@ -51,13 +57,15 @@ export default function ChatBox({chat}) {
                 resize-none
                 focus:outline-none
                 p-2'
-                placeholder='Send a message'/>
+                placeholder='Send a message'
+                onChange={(e) => setMessage(e.target.value)}/>
             
                 <button className='
                 text-blue-500 
                 hover:cursor-pointer
                 hover:text-blue-600
-                flex size-10'>
+                flex size-10'
+                onClick={() => SendMessage()}>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                         <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
                     </svg>
