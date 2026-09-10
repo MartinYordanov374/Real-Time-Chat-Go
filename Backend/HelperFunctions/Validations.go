@@ -68,7 +68,7 @@ func ValidateEmail(Email string) bool {
 }
 
 func HashPassword(Password string) string {
-	// TODO: The password shoihuld be using a cost value from an env file.
+	// NOTE: The password shoihuld be using a cost value from an env file.
 	HashedPassword, err := bcrypt.GenerateFromPassword([]byte(Password), bcrypt.DefaultCost)
 	if err != nil {
 		panic(err)
@@ -78,7 +78,6 @@ func HashPassword(Password string) string {
 }
 
 func UsernameExists(Username string) bool {
-	// TODO: Rename to UserExists
 	var user MongoConfig.User
 	TrimmedUsername := strings.TrimSpace(Username)
 	filter := bson.M{"username": TrimmedUsername}
