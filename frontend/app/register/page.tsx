@@ -7,10 +7,14 @@ export default function RegisterPage() {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
   function HandleRegister(){
-    // TODO: Check if the confirm password field value matches the password field value
-    PerformRegister()
+    if (confirmPassword == password){
+          PerformRegister()
+    }else{
+      console.log('The passwords do not match!')
+    }
   }
 
   async function PerformRegister(){
@@ -112,6 +116,7 @@ export default function RegisterPage() {
             focus:ring-2 
             focus:ring-blue-500
             mb-4"
+            onChange={() => setConfirmPassword(e.target.value)}
           />
           <button
             type="submit"

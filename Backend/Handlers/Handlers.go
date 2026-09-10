@@ -15,7 +15,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// TODO: Add more descriptive error messages, i.e., tell what the requirements for a pass and username are.
 func Login(GinContext *gin.Context) {
 
 	var UserData MongoConfig.User
@@ -25,7 +24,7 @@ func Login(GinContext *gin.Context) {
 		if HelperFunctions.UsernameExists(UserData.Username) {
 			var TargetUser MongoConfig.User
 			filter := bson.M{"username": UserData.Username}
-			err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&TargetUser)
+			err := GlobalVariables.MongoUsersCollection.FindOne(context.Background(), filter).Decode(&TargetUser)
 			if err != nil {
 				GinContext.JSON(500, gin.H{"message": "Internal Server Error"})
 				return
@@ -40,7 +39,7 @@ func Login(GinContext *gin.Context) {
 				if SessionError != nil {
 					log.Println(SessionError)
 				}
-				err := Redis.Client.Set(context.TODO(), SessionID, SessionData, GlobalVariables.SessionDuration).Err()
+				err := Redis.Client.Set(context.Background(), SessionID, SessionData, GlobalVariables.SessionDuration).Err()
 				if err != nil {
 					log.Println(err)
 				}
@@ -59,7 +58,7 @@ func Login(GinContext *gin.Context) {
 }
 
 func Register(GinContext *gin.Context) {
-	// TODO: If the username is unique, then conbsider removing the email field
+	// TODO: Remove email field
 	var UserData MongoConfig.User
 	GinContext.BindJSON(&UserData)
 
@@ -72,7 +71,7 @@ func Register(GinContext *gin.Context) {
 				if HelperFunctions.ValidatePassword(UserData.Password) {
 					HashedPassword := HelperFunctions.HashPassword(UserData.Password)
 					newUser := MongoConfig.User{Username: UserData.Username, Password: HashedPassword, Email: UserData.Email}
-					_, error := GlobalVariables.MongoUsersCollection.InsertOne(context.TODO(), newUser)
+					_, error := GlobalVariables.MongoUsersCollection.InsertOne(context.Background(), newUser)
 					if error != nil {
 						GinContext.JSON(500, gin.H{
 							"message": error})
@@ -96,13 +95,9 @@ func Register(GinContext *gin.Context) {
 	}
 }
 
-// TODO: The below functions are accessible to logged in users only
-// TODO: Take care of authorization also
-// TODO: Each sent message that is not read by the receiver shall land in the inbox
-// TODO: The inbox shall also include history and the received chat requests
+
+// TODO: Implement inbox
 func SendMessage(GinContext *gin.Context) {
-	// TODO: Follow the steps below
-	// 1. Get the sender's data via the session cookie
 	SessionCookie, err := GinContext.Cookie("SessionID")
 	var RequestBody MongoConfig.Message
 	GinContext.BindJSON(&RequestBody)
@@ -111,7 +106,7 @@ func SendMessage(GinContext *gin.Context) {
 		log.Println(err)
 	} else {
 		log.Println(SessionCookie)
-		RedisSession, err := Redis.Client.Get(context.TODO(), SessionCookie).Result()
+		RedisSession, err := Redis.Client.Get(context.Background(), SessionCookie).Result()
 		if err != nil {
 			log.Println(err)
 		} else {
@@ -123,9 +118,8 @@ func SendMessage(GinContext *gin.Context) {
 				log.Println(err)
 				return
 			}
-			// TODO: Consider the opportunity for the user to send messages to themselves
+			// NOTE: Consider the opportunity for the user to send messages to themselves
 			// Call this chat "Notes"
-			// TODO: Implement Chat Titles
 			SenderID := SessionData.UserID
 			ReceiverID := GinContext.Param("ReceiverID")
 			ConvertedReceiverID, err := bson.ObjectIDFromHex(ReceiverID)
@@ -150,7 +144,7 @@ func SendMessage(GinContext *gin.Context) {
 							if err != nil {
 								log.Println(err)
 							}
-							pubSubErr := Redis.Client.Publish(context.TODO(), "Message", MarshaledData).Err()
+							pubSubErr := Redis.Client.Publish(context.Background(), "Message", MarshaledData).Err()
 							if pubSubErr != nil {
 								log.Println(pubSubErr)
 							}
@@ -191,17 +185,17 @@ func RejectChatRequest(GinContext *gin.Context) {
 }
 
 func Logout(GinContext *gin.Context) {
-	// TODO: This function deleted the session cookie and removes the session from the Redis session storage
+	// NOTE: This function deleted the session cookie and removes the session from the Redis session storage
 }
 
 func InviteUserToGroupChat(GinContext *gin.Context) {
-	// TODO: This function shall invite a user to join an already existing chat between two or more users.
+	// NOTE: This function shall invite a user to join an already existing chat between two or more users.
 	// 1. Validate that the receiver user exists
 	// 2. Send them a request and wait for their response
 }
 
 func RetrieveChat(GinContext *gin.Context) {
-	// TODO: Make sure that the user fetching this is a member of the chat
+	// NOTE: Make sure that the user fetching this is a member of the chat
 	ChatID, err := bson.ObjectIDFromHex(GinContext.Param("ChatID"))
 	if err != nil {
 		log.Println(err)
@@ -217,7 +211,7 @@ func RetrieveChat(GinContext *gin.Context) {
 func RetrieveAllUserChats(GinContext *gin.Context) {
 	// TODO: The below is repeating code. Move it to a helper function
 	SessionCookie, err := GinContext.Cookie("SessionID")
-	RedisSession, err := Redis.Client.Get(context.TODO(), SessionCookie).Result()
+	RedisSession, err := Redis.Client.Get(context.Background(), SessionCookie).Result()
 	if err != nil {
 		log.Println(err)
 		log.Println("The session is inactive")
@@ -239,7 +233,7 @@ func RetrieveAllUserChats(GinContext *gin.Context) {
 
 func GetCurrentUserData(GinContext *gin.Context) {
 	SessionCookie, err := GinContext.Cookie("SessionID")
-	RedisSession, err := Redis.Client.Get(context.TODO(), SessionCookie).Result()
+	RedisSession, err := Redis.Client.Get(context.Background(), SessionCookie).Result()
 	if err != nil {
 		log.Println(err)
 		log.Println("The session is inactive")

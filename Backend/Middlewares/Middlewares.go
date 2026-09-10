@@ -18,7 +18,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			GinContext.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "Cookie Missing"})
 			return
 		}
-		RedisSession, RedisResultError := Redis.Client.Get(context.TODO(), SessionCookie).Result()
+		RedisSession, RedisResultError := Redis.Client.Get(context.Background(), SessionCookie).Result()
 		if RedisResultError != nil {
 			GinContext.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "This session does not exist in redis"})
 			return

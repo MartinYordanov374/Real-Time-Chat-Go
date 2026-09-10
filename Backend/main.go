@@ -21,12 +21,8 @@ func main() {
 	WebSocketsHub := WebSockets.NewHub()
 	WebSocketsHandler := WebSockets.CreateHandler(WebSocketsHub)
 	router.POST("/login", Middlewares.CORSMiddleware(), HandlerFunctions.Login)
-
 	router.POST("/register", Middlewares.CORSMiddleware(), HandlerFunctions.Register)
-
-	// TODO; Implement logout
 	router.POST("/logout", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.Logout)
-
 	router.GET("/RetrieveChat/:ChatID", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.RetrieveChat)
 	router.POST("/SendMessage/:ReceiverID", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.SendMessage)
 	router.POST("/InviteUserToGroupChat/:UserID/:ChatID", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.InviteUserToGroupChat)

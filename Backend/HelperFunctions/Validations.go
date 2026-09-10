@@ -35,7 +35,6 @@ func ValidateUsername(Username string) bool {
 }
 
 func ValidatePassword(Password string) bool {
-	// TODO: Move all regexes to a seperate file
 	TrimmedPassword := strings.TrimSpace(Password)
 	if len(TrimmedPassword) >= 15 {
 		AtLeastOneLowerCaseRegex := regexp.MustCompile(`[a-z]`)
@@ -83,7 +82,7 @@ func UsernameExists(Username string) bool {
 	var user MongoConfig.User
 	TrimmedUsername := strings.TrimSpace(Username)
 	filter := bson.M{"username": TrimmedUsername}
-	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
+	err := GlobalVariables.MongoUsersCollection.FindOne(context.Background(), filter).Decode(&user)
 
 	if err != nil {
 		log.Println(err)
@@ -97,7 +96,7 @@ func EmailExists(Email string) bool {
 	var user MongoConfig.User
 	TrimmedEmail := strings.TrimSpace(Email)
 	filter := bson.M{"email": TrimmedEmail}
-	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
+	err := GlobalVariables.MongoUsersCollection.FindOne(context.Background(), filter).Decode(&user)
 
 	if err != nil {
 		log.Println(err)
@@ -110,7 +109,7 @@ func EmailExists(Email string) bool {
 func UserExistsByID(UserID bson.ObjectID) bool {
 	var user MongoConfig.User
 	filter := bson.M{"_id": UserID}
-	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
+	err := GlobalVariables.MongoUsersCollection.FindOne(context.Background(), filter).Decode(&user)
 	if err != nil {
 		return false
 	} else {
@@ -121,7 +120,7 @@ func UserExistsByID(UserID bson.ObjectID) bool {
 func GetUserData(UserID bson.ObjectID) (string, error) {
 	var user MongoConfig.User
 	filter := bson.M{"_id": UserID}
-	err := GlobalVariables.MongoUsersCollection.FindOne(context.TODO(), filter).Decode(&user)
+	err := GlobalVariables.MongoUsersCollection.FindOne(context.Background(), filter).Decode(&user)
 	if err != nil {
 		return "", err
 	}

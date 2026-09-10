@@ -16,7 +16,7 @@ import (
 func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool {
 	var chat MongoConfig.Chat
 	filter := bson.M{"creator_id": SenderID, "receiver_id": ReceiverID}
-	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&chat)
+	err := GlobalVariables.MongoChatsCollection.FindOne(context.Background(), filter).Decode(&chat)
 
 	if err != nil {
 		return false
@@ -32,7 +32,7 @@ func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) {
 		CreationDate: time.Now(),
 	}
 
-	_, err := GlobalVariables.MongoChatsCollection.InsertOne(context.TODO(), newChat)
+	_, err := GlobalVariables.MongoChatsCollection.InsertOne(context.Background(), newChat)
 
 	if err != nil {
 		log.Println(err)
@@ -50,7 +50,7 @@ func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content s
 		SenderID:    SenderID,
 	}
 
-	_, err := GlobalVariables.MongoMessagesCollection.InsertOne(context.TODO(), newMessage)
+	_, err := GlobalVariables.MongoMessagesCollection.InsertOne(context.Background(), newMessage)
 	if err != nil {
 		log.Println(err)
 	}
@@ -61,7 +61,7 @@ func RetrieveChatID(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) bson.Obje
 	// TODO: Make those filters bi-directional
 	var TargetChat MongoConfig.Chat
 	filter := bson.M{"creator_id": CreatorID, "receiver_id": ReceiverID}
-	err := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), filter).Decode(&TargetChat)
+	err := GlobalVariables.MongoChatsCollection.FindOne(context.Background(), filter).Decode(&TargetChat)
 	if err != nil {
 		log.Println(err)
 		return bson.NilObjectID
@@ -71,10 +71,9 @@ func RetrieveChatID(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) bson.Obje
 }
 
 func ChatRequestSent(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool {
-	// TODO: Check if the request object exists
 	filter := bson.M{"sender_id": SenderID, "receiver_id": ReceiverID}
 	var TargetRequest MongoConfig.Request
-	err := GlobalVariables.MongoRequestsCollection.FindOne(context.TODO(), filter).Decode(&TargetRequest)
+	err := GlobalVariables.MongoRequestsCollection.FindOne(context.Background(), filter).Decode(&TargetRequest)
 	if err != nil {
 		log.Println(err)
 		return false
@@ -85,7 +84,6 @@ func ChatRequestSent(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bool {
 }
 
 func SendChatRequest(SenderID bson.ObjectID, ReceiverID bson.ObjectID) {
-	// TODO: Create Request Object
 	if !ChatRequestSent(SenderID, ReceiverID) {
 		NewRequest := MongoConfig.Request{
 			SenderID:   SenderID,
@@ -93,7 +91,7 @@ func SendChatRequest(SenderID bson.ObjectID, ReceiverID bson.ObjectID) {
 			Status:     MongoConfig.RequestPending,
 			TimeStamp:  time.Now(),
 		}
-		_, err := GlobalVariables.MongoRequestsCollection.InsertOne(context.TODO(), NewRequest)
+		_, err := GlobalVariables.MongoRequestsCollection.InsertOne(context.Background(), NewRequest)
 		if err != nil {
 			log.Println(err)
 		} else {
@@ -109,7 +107,7 @@ func GetChatRequestStatus(SenderID bson.ObjectID, ReceiverID bson.ObjectID) Mong
 	filter := bson.M{"sender_id": SenderID, "receiver_id": ReceiverID}
 	var TargetRequest MongoConfig.Request
 
-	err := GlobalVariables.MongoRequestsCollection.FindOne(context.TODO(), filter).Decode(&TargetRequest)
+	err := GlobalVariables.MongoRequestsCollection.FindOne(context.Background(), filter).Decode(&TargetRequest)
 	if err != nil {
 		log.Println(err)
 		return MongoConfig.RequestError
@@ -118,11 +116,6 @@ func GetChatRequestStatus(SenderID bson.ObjectID, ReceiverID bson.ObjectID) Mong
 }
 
 func AcceptChatRequest(RequestID bson.ObjectID) {
-	// TODO: This function shall handle a user's response to a request
-	// 1. If the request is rejected, delete all conversation and correspondingb messages with the sender
-	// 2. If the request is approved, the chat remains and the sender can send more messages than just one.
-
-	// TODO: Verify that the requesting user ID is the same as RECEIVER ID for the said request
 	filter := bson.M{"_id": RequestID}
 	Update := bson.M{
 		"$set": bson.M{
@@ -130,7 +123,7 @@ func AcceptChatRequest(RequestID bson.ObjectID) {
 		},
 	}
 
-	_, err := GlobalVariables.MongoRequestsCollection.UpdateOne(context.TODO(), filter, Update)
+	_, err := GlobalVariables.MongoRequestsCollection.UpdateOne(context.Background(), filter, Update)
 	if err != nil {
 		log.Println(err)
 	}
@@ -145,18 +138,17 @@ func RejectChatRequest(RequestID bson.ObjectID) {
 		},
 	}
 
-	_, err := GlobalVariables.MongoRequestsCollection.UpdateOne(context.TODO(), filter, Update)
+	_, err := GlobalVariables.MongoRequestsCollection.UpdateOne(context.Background(), filter, Update)
 	if err != nil {
 		log.Println(err)
 	}
-	// TODO: Delete the respective conversation and all associated messages upon rejection
 	DeleteRejectedRequestChat(RequestID)
 }
 
 func DeleteRejectedRequestChat(RequestID bson.ObjectID) {
 	var request MongoConfig.Request
 	filter := bson.M{"_id": RequestID}
-	err := GlobalVariables.MongoRequestsCollection.FindOne(context.TODO(), filter).Decode(&request)
+	err := GlobalVariables.MongoRequestsCollection.FindOne(context.Background(), filter).Decode(&request)
 	if err != nil {
 		log.Println(err)
 	}
@@ -175,7 +167,7 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID) {
 		},
 	}
 
-	ChatErr := GlobalVariables.MongoChatsCollection.FindOne(context.TODO(), chatFilter).Decode(&chat)
+	ChatErr := GlobalVariables.MongoChatsCollection.FindOne(context.Background(), chatFilter).Decode(&chat)
 
 	if ChatErr != nil {
 		log.Println(ChatErr)
@@ -185,18 +177,18 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID) {
 		"chat_id": chat.ID,
 	}
 
-	_, MessagesErr := GlobalVariables.MongoMessagesCollection.DeleteMany(context.TODO(), messageFilter)
+	_, MessagesErr := GlobalVariables.MongoMessagesCollection.DeleteMany(context.Background(), messageFilter)
 
 	if MessagesErr != nil {
 		log.Println(MessagesErr)
 	}
 
-	_, ChatDelErr := GlobalVariables.MongoChatsCollection.DeleteOne(context.TODO(), bson.M{"_id": chat.ID})
+	_, ChatDelErr := GlobalVariables.MongoChatsCollection.DeleteOne(context.Background(), bson.M{"_id": chat.ID})
 	if ChatDelErr != nil {
 		log.Println(ChatDelErr)
 	}
 
-	_, RequestDelErr := GlobalVariables.MongoRequestsCollection.DeleteOne(context.TODO(), bson.M{"_id": RequestID})
+	_, RequestDelErr := GlobalVariables.MongoRequestsCollection.DeleteOne(context.Background(), bson.M{"_id": RequestID})
 
 	if RequestDelErr != nil {
 		log.Println(RequestDelErr)
@@ -205,7 +197,7 @@ func DeleteRejectedRequestChat(RequestID bson.ObjectID) {
 }
 
 func CacheMessageRedis(Message MongoConfig.Message) {
-	// TODO: If a message gets edited or deleted, the cache for the said conversation should be destroyed entireloy
+	// NOTE: If a message gets edited or deleted, the cache for the said conversation should be destroyed entireloy
 	key := "chat:" + Message.ChatID.Hex() + ":messages"
 
 	MarshaledMessage, err := json.Marshal(Message)
@@ -213,13 +205,12 @@ func CacheMessageRedis(Message MongoConfig.Message) {
 		log.Println(err)
 		return
 	}
-	// TODO: Expire the stored messages after, say, 12 h
 	pipeline := Redis.Client.Pipeline()
-	pipeline.LPush(context.TODO(), key, MarshaledMessage)
-	pipeline.LTrim(context.TODO(), key, 0, 49)
-	pipeline.Expire(context.TODO(), key, 1*time.Hour)
+	pipeline.LPush(context.Background(), key, MarshaledMessage)
+	pipeline.LTrim(context.Background(), key, 0, 49)
+	pipeline.Expire(context.Background(), key, 1*time.Hour)
 
-	_, err = pipeline.Exec(context.TODO())
+	_, err = pipeline.Exec(context.Background())
 	if err != nil {
 		log.Println(err)
 	}
@@ -227,7 +218,7 @@ func CacheMessageRedis(Message MongoConfig.Message) {
 
 func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error) {
 	key := "chat:" + ChatID.Hex() + ":messages"
-	msgs, err := Redis.Client.LRange(context.TODO(), key, 0, 49).Result()
+	msgs, err := Redis.Client.LRange(context.Background(), key, 0, 49).Result()
 
 	if err != nil {
 		log.Println(err)
@@ -262,14 +253,14 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat {
 			{"receiver_id": UserID},
 		}}
 
-	cursor, err := GlobalVariables.MongoChatsCollection.Find(context.TODO(), UserChatsFilter)
+	cursor, err := GlobalVariables.MongoChatsCollection.Find(context.Background(), UserChatsFilter)
 
 	if err != nil {
 		log.Println(err)
 	}
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(context.Background())
 
-	err = cursor.All(context.TODO(), &TargetChats)
+	err = cursor.All(context.Background(), &TargetChats)
 	if err != nil {
 		log.Println(err)
 	}
@@ -280,7 +271,6 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat {
 			log.Println(err)
 		}
 		TargetChats[idx].Messages = res
-		// TODO: Try to find a more optimal way to get the username without look ups or changing any of the structs
 		if TargetChat.CreatorID == UserID {
 			DisplayedUserID := TargetChat.ReceiverID
 			DisplayedUsername, err := GetUserData(DisplayedUserID)
@@ -304,20 +294,19 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat {
 }
 
 func FetchLatestMessagesFromDB(ChatID bson.ObjectID) ([]MongoConfig.Message, error) {
-	// TODO: This function will also be used if the user scrolls beyond the cached messages.
 	// NOTE: A cursor will be needed for that purpose pointing to the latest message that the user has seen in the chat.
 	filter := bson.M{"chat_id": ChatID}
 	opts := options.Find().SetLimit(50)
 
 	var TargetMessages []MongoConfig.Message
 
-	cursor, err := GlobalVariables.MongoMessagesCollection.Find(context.TODO(), filter, opts)
+	cursor, err := GlobalVariables.MongoMessagesCollection.Find(context.Background(), filter, opts)
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(context.Background())
 
-	err = cursor.All(context.TODO(), &TargetMessages)
+	err = cursor.All(context.Background(), &TargetMessages)
 
 	if err != nil {
 		return nil, err
