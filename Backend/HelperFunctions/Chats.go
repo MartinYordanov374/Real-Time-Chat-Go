@@ -58,9 +58,13 @@ func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content s
 }
 
 func RetrieveChatID(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) bson.ObjectID {
-	// TODO: Make those filters bi-directional
 	var TargetChat MongoConfig.Chat
-	filter := bson.M{"creator_id": CreatorID, "receiver_id": ReceiverID}
+	filter := bson.M{
+	"$or": []bson.M{
+		{"creator_id": CreatorID, "receiver_id": ReceiverID},
+		{"creator_id": ReceiverID, "receiver_id": CreatorID},
+	},
+}
 	err := GlobalVariables.MongoChatsCollection.FindOne(context.Background(), filter).Decode(&TargetChat)
 	if err != nil {
 		log.Println(err)
