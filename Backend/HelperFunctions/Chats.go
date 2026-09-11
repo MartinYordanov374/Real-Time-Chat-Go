@@ -221,7 +221,7 @@ func CacheMessageRedis(Message MongoConfig.Message) {
 	}
 }
 
-func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error) {
+func GetCachedMessages(ChatID bson.ObjectID, CurrentUserID bson.ObjectID) ([]MongoConfig.Message, error) {
 	key := "chat:" + ChatID.Hex() + ":messages"
 	msgs, err := Redis.Client.LRange(context.Background(), key, 0, 49).Result()
 
@@ -237,11 +237,7 @@ func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error) {
 		}
 		return DBMessages, nil
 	}
-	RedisSession, err := HelperFunctions.GetUserSession(GinContext)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+
 	TargetMessages := make([]MongoConfig.Message, 0, len(msgs))
 	for _, Message := range msgs {
 		var TargetMessage MongoConfig.Message
@@ -249,9 +245,9 @@ func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error) {
 		if err != nil {
 			continue
 		}
-		if TargetMessage.SenderID == RedisSession.UserID{
+		if TargetMessage.SenderID == CurrentUserID {
 			TargetMessage.IsCurrentUserSender = true
-		}else{
+		} else {
 			TargetMessage.IsCurrentUserSender = false
 		}
 		TargetMessages = append(TargetMessages, TargetMessage)
@@ -280,7 +276,7 @@ func RetrieveAllUserChats(UserID bson.ObjectID) []MongoConfig.Chat {
 	}
 	// Retrieving Messages
 	for idx, TargetChat := range TargetChats {
-		res, err := GetCachedMessages(TargetChat.ID)
+		res, err := GetCachedMessages(TargetChat.ID, UserID)
 		if err != nil {
 			log.Println(err)
 		}

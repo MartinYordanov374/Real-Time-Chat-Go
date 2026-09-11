@@ -198,7 +198,12 @@ func RetrieveChat(GinContext *gin.Context) {
 	if err != nil {
 		log.Println(err)
 	}
-	messages, err := HelperFunctions.GetCachedMessages(ChatID)
+	RedisSession, err := HelperFunctions.GetUserSession(GinContext)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	messages, err := HelperFunctions.GetCachedMessages(ChatID, RedisSession.UserID)
 	if err != nil {
 		GinContext.JSON(500, gin.H{"error": err})
 		return
