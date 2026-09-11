@@ -78,7 +78,7 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context) {
 		// TODO: Implement sent/delievered functionality
 		// TODO: Implement a writing indicator functionality
 		// TODO: Implement an online/offline status indicator functionality
-		SendMessageToClient(Handler.Hub, PayloadData.UserID, PayloadData.Content)
+		SendMessageToClient(Handler.Hub, PayloadData.SenderID, PayloadData.ReceiverID, PayloadData.Content)
 	}
 }
 
@@ -99,11 +99,11 @@ func (Client *Client) ReadPump() {
 	// Its purpose is to take notice of any user changes, i.e., disconnected, is typing, etc.
 }
 
-func SendMessageToClient(Hub *Hub, ReceiverID bson.ObjectID, Message string) {
+func SendMessageToClient(Hub *Hub, SenderID bson.ObjectID, ReceiverID bson.ObjectID, Message string) {
+	// TODO: Find a way to make this O(1)
 	for client := range Hub.ActiveClients {
-		if client.UserID == ReceiverID {
+		if client.UserID == SenderID || client.UserID == ReceiverID {
 			client.SendChannel <- []byte(Message)
 		}
-		// TODO: Also publish the message to the sender's channel!
 	}
 }
