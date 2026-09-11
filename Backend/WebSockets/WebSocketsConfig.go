@@ -2,8 +2,6 @@ package WebSockets
 
 import (
 	MongoConfig "RealTimeChatApp/Backend/Mongo"
-	"RealTimeChatApp/Backend/Redis"
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -55,33 +53,11 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context) {
 	}
 
 	Handler.Hub.RegisterClient(Client)
-	// TODO: Move the subscription out of the socket connection handler to avoid duplications
-	sub := Redis.Client.Subscribe(context.Background(), "Message")
-	defer sub.Close()
-
+	// TODO: Implement sent/delievered functionality
+	// TODO: Implement a writing indicator functionality
+	// TODO: Implement an online/offline status indicator functionality
 	go Client.WritePump()
 	go Client.ReadPump(Handler.Hub)
-	for {
-		msg, err := sub.ReceiveMessage(context.Background())
-		if err != nil {
-			log.Println(err)
-		}
-
-		var PayloadData MongoConfig.Message
-		err = json.Unmarshal([]byte(msg.Payload), &PayloadData)
-		if err != nil {
-			log.Println(err)
-		}
-		// TODO: Consider what happens when the user is offline when they are sent a message
-		// Store the messages in the DB, cache the last 100 messages in Redis
-		// When they come back check if any new messages compared to the latest Redis cached one have arrived
-		// If yes, fetch directly from the DB, otherwise fetch from Redis
-		//
-		// TODO: Implement sent/delievered functionality
-		// TODO: Implement a writing indicator functionality
-		// TODO: Implement an online/offline status indicator functionality
-		SendMessageToClient(Handler.Hub, PayloadData)
-	}
 }
 
 func (Client *Client) WritePump() {
@@ -94,7 +70,6 @@ func (Client *Client) WritePump() {
 			log.Println(err)
 			return
 		}
-		// TODO: Handle what happens after closing the channels
 	}
 }
 

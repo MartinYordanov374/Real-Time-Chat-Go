@@ -4,6 +4,7 @@ import (
 	HandlerFunctions "RealTimeChatApp/Backend/Handlers"
 	"RealTimeChatApp/Backend/Middlewares"
 	MongoConfig "RealTimeChatApp/Backend/Mongo"
+	"RealTimeChatApp/Backend/Redis"
 	"RealTimeChatApp/Backend/WebSockets"
 
 	"github.com/gin-gonic/gin"
@@ -20,6 +21,7 @@ func main() {
 
 	WebSocketsHub := WebSockets.NewHub()
 	WebSocketsHandler := WebSockets.CreateHandler(WebSocketsHub)
+	go Redis.RedisMessageSubscribeHandler(WebSocketsHub)
 	router.POST("/login", Middlewares.CORSMiddleware(), HandlerFunctions.Login)
 	router.POST("/register", Middlewares.CORSMiddleware(), HandlerFunctions.Register)
 	router.POST("/logout", Middlewares.CORSMiddleware(), Middlewares.AuthMiddleware(), HandlerFunctions.Logout)

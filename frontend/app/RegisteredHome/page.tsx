@@ -50,6 +50,8 @@ export default function page() {
         ...prevState,
         parsedData
       ])
+
+      console.log("message sent")
     }
 
     Socket.onclose = () => {
