@@ -36,6 +36,7 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context) {
 
 	if !Exists {
 		GinContext.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized to perform this action"})
+		return
 	}
 
 	SocketConnection, err := ConnectionUpgrader.Upgrade(GinContext.Writer, GinContext.Request, nil)
@@ -98,7 +99,7 @@ func (Client *Client) WritePump() {
 func (client *Client) ReadPump(hub *Hub) {
 	// 1. Unregister the client upon disconnect
 	// 2. Close the connection upon disconnect
-	defer func(){
+	defer func() {
 		hub.UnregisterClient(client)
 		client.Connection.Close()
 	}()
