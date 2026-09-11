@@ -207,15 +207,11 @@ func RetrieveChat(GinContext *gin.Context) {
 }
 
 func RetrieveAllUserChats(GinContext *gin.Context) {
-	// TODO: The below is repeating code. Move it to a helper function
-	SessionCookie, err := GinContext.Cookie("SessionID")
-	RedisSession, err := Redis.Client.Get(context.Background(), SessionCookie).Result()
+	RedisSession, err := HelperFunctions.GetUserSession(GinContext)
 	if err != nil {
 		log.Println(err)
-		log.Println("The session is inactive")
 		return
 	}
-
 	var SessionData Redis.Session
 	RedisData := []byte(RedisSession)
 	err = json.Unmarshal(RedisData, &SessionData)
@@ -230,14 +226,11 @@ func RetrieveAllUserChats(GinContext *gin.Context) {
 }
 
 func GetCurrentUserData(GinContext *gin.Context) {
-	SessionCookie, err := GinContext.Cookie("SessionID")
-	RedisSession, err := Redis.Client.Get(context.Background(), SessionCookie).Result()
+	RedisSession, err := HelperFunctions.GetUserSession(GinContext)
 	if err != nil {
 		log.Println(err)
-		log.Println("The session is inactive")
 		return
 	}
-
 	var SessionData Redis.Session
 	RedisData := []byte(RedisSession)
 	err = json.Unmarshal(RedisData, &SessionData)
