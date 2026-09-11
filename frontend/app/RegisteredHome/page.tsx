@@ -47,11 +47,10 @@ export default function page() {
     Socket.onmessage = (event) => {
       let parsedData = JSON.parse(event.data)
       setSelectedChatMessages((prevState) => [
-        ...prevState,
-        parsedData
+        parsedData,
+        ...prevState
       ])
 
-      console.log("message sent")
     }
 
     Socket.onclose = () => {

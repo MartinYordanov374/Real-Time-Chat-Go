@@ -2,12 +2,12 @@
 import React from 'react'
 import MessageBox from '../MessageBox/MessageBox'
 import Axios from 'axios'
-import {useState, useEffect, useRef} from 'react'
-
+import {useState, useEffect} from 'react'
+import {Message} from '@/Types/Types'
 
 export default function ChatBox({chat, chatMessages, setChatMessages}) {
   let online : boolean = true
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState<string>('')
   useEffect(() => {
     setChatMessages(chat?.messages ?? [])
   }, [chat])
@@ -40,11 +40,9 @@ export default function ChatBox({chat, chatMessages, setChatMessages}) {
                 }
             </div>
         </div>
-        <div className='flex flex-col max-w h-screen p-10 max-h-screen overflow-scroll'>
-            {chatMessages.map((message) => (
-                <MessageBox 
-                content={message.textContent}
-                sender={message.senderId}/>
+        <div className='flex flex-col-reverse max-w h-screen p-10 max-h-screen overflow-scroll'>
+            {chatMessages.map((message : Message) => (
+                <MessageBox textContent={message.textContent} IsUserSender={message.IsUserSender} id={message.id}/>
             ))}
         </div>
         <div className='sticky bottom-0 bg-white p-4 gap-2'>

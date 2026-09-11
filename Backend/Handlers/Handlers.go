@@ -138,7 +138,6 @@ func SendMessage(GinContext *gin.Context) {
 							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
 							MessageObject := HelperFunctions.CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
 							HelperFunctions.CacheMessageRedis(MessageObject)
-							//RedisMessage := GlobalVariables.RedisMessage{ConvertedReceiverID, SenderID, RequestBody.TextContent}
 							MarshaledData, err := json.Marshal(MessageObject)
 							if err != nil {
 								log.Println(err)

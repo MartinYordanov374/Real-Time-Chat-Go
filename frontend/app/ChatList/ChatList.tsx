@@ -20,7 +20,7 @@ export default function ChatList({chats, onSelect, currentUsername}) {
       </div>
       {/* 3. Contacts List */}
       {chats.map((Chat) => (
-        <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer' onClick={() => onSelect(Chat)}>
+        <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer' onClick={() => onSelect(Chat)} key={Chat.id}>
           <div className='flex'>
             <div className=' flex size-12 rounded-full bg-blue-500 p-2 justify-center items-center'>
               PFP
