@@ -13,14 +13,6 @@ export default function ChatBox({chat}) {
     setChatMessages(chat?.messages ?? [])
   }, [chat])
 
-  useEffect(() => {
-    const Socket = new WebSocket("http://localhost:8080/ws")
-
-    Socket.onmessage = (event) => {
-        console.log(event.data)
-    }
-  }, [])
-  // TODO: Establish socket connection here and add the message to the chatMessages list
   async function SendMessage(){
     let res = await Axios.post(`http://localhost:8080/SendMessage/${chat.receiverId}`, {"TextContent": message}, {withCredentials: true})
     .then((res) => {

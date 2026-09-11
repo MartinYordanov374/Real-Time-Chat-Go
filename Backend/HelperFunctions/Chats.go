@@ -41,13 +41,14 @@ func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) {
 	}
 }
 
-func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content string) MongoConfig.Message {
+func CreateMessageObject(SenderID bson.ObjectID, ReceiverID bson.ObjectID, ChatID bson.ObjectID, Content string) MongoConfig.Message {
 	newMessage := MongoConfig.Message{
 		ID:          bson.NewObjectID(),
 		ChatID:      ChatID,
 		TextContent: Content,
 		TimeStamp:   time.Now(),
 		SenderID:    SenderID,
+		ReceiverID:  ReceiverID,
 	}
 
 	_, err := GlobalVariables.MongoMessagesCollection.InsertOne(context.Background(), newMessage)
@@ -60,11 +61,11 @@ func CreateMessageObject(SenderID bson.ObjectID, ChatID bson.ObjectID, Content s
 func RetrieveChatID(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) bson.ObjectID {
 	var TargetChat MongoConfig.Chat
 	filter := bson.M{
-	"$or": []bson.M{
-		{"creator_id": CreatorID, "receiver_id": ReceiverID},
-		{"creator_id": ReceiverID, "receiver_id": CreatorID},
-	},
-}
+		"$or": []bson.M{
+			{"creator_id": CreatorID, "receiver_id": ReceiverID},
+			{"creator_id": ReceiverID, "receiver_id": CreatorID},
+		},
+	}
 	err := GlobalVariables.MongoChatsCollection.FindOne(context.Background(), filter).Decode(&TargetChat)
 	if err != nil {
 		log.Println(err)

@@ -95,7 +95,6 @@ func Register(GinContext *gin.Context) {
 	}
 }
 
-
 // TODO: Implement inbox
 func SendMessage(GinContext *gin.Context) {
 	SessionCookie, err := GinContext.Cookie("SessionID")
@@ -132,15 +131,15 @@ func SendMessage(GinContext *gin.Context) {
 						HelperFunctions.SendChatRequest(SenderID, ConvertedReceiverID)
 						HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
 						CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
-						HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
+						HelperFunctions.CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
 					} else {
 						RequestStatus := HelperFunctions.GetChatRequestStatus(SenderID, ConvertedReceiverID)
 						if RequestStatus == MongoConfig.RequestAccepted {
 							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
-							MessageObject := HelperFunctions.CreateMessageObject(SenderID, CurrentChatID, RequestBody.TextContent)
+							MessageObject := HelperFunctions.CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
 							HelperFunctions.CacheMessageRedis(MessageObject)
-							RedisMessage := GlobalVariables.RedisMessage{ConvertedReceiverID, SenderID, RequestBody.TextContent}
-							MarshaledData, err := json.Marshal(RedisMessage)
+							//RedisMessage := GlobalVariables.RedisMessage{ConvertedReceiverID, SenderID, RequestBody.TextContent}
+							MarshaledData, err := json.Marshal(MessageObject)
 							if err != nil {
 								log.Println(err)
 							}

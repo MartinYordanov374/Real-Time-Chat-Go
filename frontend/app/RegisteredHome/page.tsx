@@ -33,6 +33,26 @@ export default function page() {
     RetrieveUserChats()
   }, [])
 
+
+  useEffect(() => {
+    const Socket = new WebSocket("ws://localhost:8080/ws")
+    Socket.onopen = () => {
+        console.log('Socket connection established')
+    }
+    Socket.onmessage = (event) => {
+       let parsedData = JSON.parse(event.data)
+       console.log(parsedData)
+    }
+
+    Socket.onclose = () => {
+        console.log('socket connection closed')
+    }
+    
+    return () => {
+      Socket.close()
+    }
+  }, [selectedChat?.id])
+
   return (
     loading == false ?
     <div className="flex">

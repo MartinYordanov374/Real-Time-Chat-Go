@@ -1,7 +1,7 @@
 package WebSockets
 
 import (
-	"RealTimeChatApp/Backend/GlobalVariables"
+	MongoConfig "RealTimeChatApp/Backend/Mongo"
 	"RealTimeChatApp/Backend/Redis"
 	"context"
 	"encoding/json"
@@ -32,6 +32,12 @@ func CreateHandler(Hub *Hub) *Handler {
 }
 
 func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context) {
+	ContextValue, Exists := GinContext.Get("UserID")
+
+	if !Exists {
+		GinContext.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized to perform this action"})
+	}
+
 	SocketConnection, err := ConnectionUpgrader.Upgrade(GinContext.Writer, GinContext.Request, nil)
 	if err != nil {
 		log.Println("Connection upgrade error: ", err)
@@ -39,12 +45,6 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context) {
 	}
 
 	log.Println("Upgraded to websocket!")
-
-	ContextValue, Exists := GinContext.Get("UserID")
-
-	if !Exists {
-		GinContext.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized to perform this action"})
-	}
 
 	UserID := ContextValue.(bson.ObjectID)
 	Client := &Client{
@@ -65,7 +65,7 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context) {
 			log.Println(err)
 		}
 
-		var PayloadData GlobalVariables.RedisMessage
+		var PayloadData MongoConfig.Message
 		err = json.Unmarshal([]byte(msg.Payload), &PayloadData)
 		if err != nil {
 			log.Println(err)
@@ -78,11 +78,12 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context) {
 		// TODO: Implement sent/delievered functionality
 		// TODO: Implement a writing indicator functionality
 		// TODO: Implement an online/offline status indicator functionality
-		SendMessageToClient(Handler.Hub, PayloadData.SenderID, PayloadData.ReceiverID, PayloadData.Content)
+		SendMessageToClient(Handler.Hub, PayloadData)
 	}
 }
 
 func (Client *Client) WritePump() {
+	defer Client.Connection.Close()
 	for {
 		msg := <-Client.SendChannel
 		err := Client.Connection.WriteMessage(websocket.TextMessage, msg)
@@ -94,16 +95,19 @@ func (Client *Client) WritePump() {
 	}
 }
 
-func (Client *Client) ReadPump() {
-	// TODO: Implement the Read Pump
-	// Its purpose is to take notice of any user changes, i.e., disconnected, is typing, etc.
+func (client *Client) ReadPump() {
+
 }
 
-func SendMessageToClient(Hub *Hub, SenderID bson.ObjectID, ReceiverID bson.ObjectID, Message string) {
+func SendMessageToClient(Hub *Hub, MessageObject MongoConfig.Message) {
 	// TODO: Find a way to make this O(1)
+	MarshaledData, err := json.Marshal(MessageObject)
+	if err != nil {
+		log.Println(err)
+	}
 	for client := range Hub.ActiveClients {
-		if client.UserID == SenderID || client.UserID == ReceiverID {
-			client.SendChannel <- []byte(Message)
+		if client.UserID == MessageObject.SenderID || client.UserID == MessageObject.ReceiverID {
+			client.SendChannel <- MarshaledData
 		}
 	}
 }

@@ -8,7 +8,7 @@ type message ={
 //TODO: Figure out a more aesthetic way of showing the timestamp
 export default function MessageBox(MessageProps : message) {
   return (
-    <div className='MessageWrapper'>
+    <div className='MessageWrapper' key={MessageProps.id}>
         {MessageProps.sender 
         ?
         <div className='flex w-full justify-end'>

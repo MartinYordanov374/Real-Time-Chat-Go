@@ -28,6 +28,7 @@ type Message struct {
 	TextContent string        `json:"textContent" bson:"text_content"`
 	TimeStamp   time.Time     `json:"timeStamp" bson:"time_stamp"`
 	SenderID    bson.ObjectID `json:"senderId" bson:"sender_id"`
+	ReceiverID  bson.ObjectID `json:"receiverId" bson:"receiver_id`
 }
 
 type Request struct {
