@@ -35,6 +35,9 @@ export default function page() {
 
 
   useEffect(() => {
+    if (!selectedChat?.id){ 
+      return 
+    }
     const Socket = new WebSocket("ws://localhost:8080/ws")
     Socket.onopen = () => {
         console.log('Socket connection established')
