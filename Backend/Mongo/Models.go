@@ -23,12 +23,13 @@ type Chat struct {
 }
 
 type Message struct {
-	ID          bson.ObjectID `json:"id" bson:"_id,omitempty"`
-	ChatID      bson.ObjectID `json:"chatId" bson:"chat_id"`
-	TextContent string        `json:"textContent" bson:"text_content"`
-	TimeStamp   time.Time     `json:"timeStamp" bson:"time_stamp"`
-	SenderID    bson.ObjectID `json:"senderId" bson:"sender_id"`
-	ReceiverID  bson.ObjectID `json:"receiverId" bson:"receiver_id`
+	ID                  bson.ObjectID `json:"id" bson:"_id,omitempty"`
+	ChatID              bson.ObjectID `json:"chatId" bson:"chat_id"`
+	TextContent         string        `json:"textContent" bson:"text_content"`
+	TimeStamp           time.Time     `json:"timeStamp" bson:"time_stamp"`
+	SenderID            bson.ObjectID `json:"senderId" bson:"sender_id"`
+	ReceiverID          bson.ObjectID `json:"receiverId" bson:"receiver_id`
+	IsCurrentUserSender bool          `json:"receiverId" bson:"receiver_id`
 }
 
 type Request struct {

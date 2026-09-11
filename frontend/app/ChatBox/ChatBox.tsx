@@ -42,7 +42,7 @@ export default function ChatBox({chat, chatMessages, setChatMessages}) {
         </div>
         <div className='flex flex-col-reverse max-w h-screen p-10 max-h-screen overflow-scroll'>
             {chatMessages.map((message : Message) => (
-                <MessageBox textContent={message.textContent} IsUserSender={message.IsUserSender} id={message.id}/>
+                <MessageBox textContent={message.textContent} IsCurrentUserSender={message.IsCurrentUserSender} id={message.id}/>
             ))}
         </div>
         <div className='sticky bottom-0 bg-white p-4 gap-2'>

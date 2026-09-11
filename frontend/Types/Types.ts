@@ -1,7 +1,7 @@
 export type Message ={
     id: number,
     textContent: string
-    IsUserSender: boolean
+    IsCurrentUserSender: boolean
 }
 
 export type ChatObject = {}

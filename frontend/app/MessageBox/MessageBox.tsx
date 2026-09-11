@@ -5,7 +5,7 @@ import {Message} from '@/Types/Types'
 export default function MessageBox(MessageProps : Message) {
     return (
     <div className='MessageWrapper' key={MessageProps.id}>
-        {MessageProps.IsUserSender 
+        {MessageProps.IsCurrentUserSender 
         ?
         <div className='flex w-full justify-end'>
             <div className='bg-blue-500 rounded-lg p-4 mt-2 min-w-[70px]'>
