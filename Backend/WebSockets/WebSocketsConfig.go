@@ -58,7 +58,7 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context) {
 	sub := Redis.Client.Subscribe(context.Background(), "Message")
 
 	go Client.WritePump()
-	go Client.ReadPump()
+	go Client.ReadPump(Handler.Hub)
 	for {
 		msg, err := sub.ReceiveMessage(context.Background())
 		if err != nil {
@@ -95,8 +95,22 @@ func (Client *Client) WritePump() {
 	}
 }
 
-func (client *Client) ReadPump() {
-
+func (client *Client) ReadPump(hub *Hub) {
+	// 1. Unregister the client upon disconnect
+	// 2. Close the connection upon disconnect
+	defer func(){
+		hub.UnregisterClient(client)
+		client.Connection.Close()
+	}()
+	// 3. Read messages and send them to the hub broadcast channel
+	for {
+		_, message, err := client.Connection.ReadMessage()
+		if err != nil {
+			log.Println(err)
+			break
+		}
+		hub.broadcast <- message
+	}
 }
 
 func SendMessageToClient(Hub *Hub, MessageObject MongoConfig.Message) {

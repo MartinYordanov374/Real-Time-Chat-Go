@@ -8,6 +8,7 @@ import (
 type Hub struct {
 	ActiveClients map[*Client]bool
 	Mutex sync.RWMutex
+	broadcast chan []byte
 }
 
 // TODO: Make the channel buffered
