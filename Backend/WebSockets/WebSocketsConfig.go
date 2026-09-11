@@ -91,6 +91,7 @@ func (Client *Client) WritePump() {
 		if err != nil {
 			log.Println("An error occurred")
 			log.Println(err)
+			return
 		}
 		// TODO: Handle what happens after closing the channels
 	}
