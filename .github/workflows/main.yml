@@ -1,0 +1,17 @@
+name: Secret-Scanning-CI
+on:
+  push:
+    branches: [ "main"]
+
+jobs:     
+  trufflehog_scan_secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Run TruffleHog secret scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --results=verified,unverified,unknown
