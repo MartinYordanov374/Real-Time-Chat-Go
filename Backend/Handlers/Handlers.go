@@ -212,16 +212,7 @@ func RetrieveAllUserChats(GinContext *gin.Context) {
 		log.Println(err)
 		return
 	}
-	var SessionData Redis.Session
-	RedisData := []byte(RedisSession)
-	err = json.Unmarshal(RedisData, &SessionData)
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	TargetChats := HelperFunctions.RetrieveAllUserChats(SessionData.UserID)
+	TargetChats := HelperFunctions.RetrieveAllUserChats(RedisSession.UserID)
 	GinContext.JSON(200, gin.H{"chats": TargetChats})
 }
 
@@ -231,16 +222,8 @@ func GetCurrentUserData(GinContext *gin.Context) {
 		log.Println(err)
 		return
 	}
-	var SessionData Redis.Session
-	RedisData := []byte(RedisSession)
-	err = json.Unmarshal(RedisData, &SessionData)
 
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	TargetUser, err := HelperFunctions.GetUserData(SessionData.UserID)
+	TargetUser, err := HelperFunctions.GetUserData(RedisSession.UserID)
 	// TODO: Fix the error handling in the entire code base once the functionality is implemented
 	if err != nil {
 		log.Println(err)

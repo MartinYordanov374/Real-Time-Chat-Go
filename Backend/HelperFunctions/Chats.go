@@ -237,13 +237,22 @@ func GetCachedMessages(ChatID bson.ObjectID) ([]MongoConfig.Message, error) {
 		}
 		return DBMessages, nil
 	}
-
+	RedisSession, err := HelperFunctions.GetUserSession(GinContext)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	TargetMessages := make([]MongoConfig.Message, 0, len(msgs))
 	for _, Message := range msgs {
 		var TargetMessage MongoConfig.Message
 		err := json.Unmarshal([]byte(Message), &TargetMessage)
 		if err != nil {
 			continue
+		}
+		if TargetMessage.SenderID == RedisSession.UserID{
+			TargetMessage.IsCurrentUserSender = true
+		}else{
+			TargetMessage.IsCurrentUserSender = false
 		}
 		TargetMessages = append(TargetMessages, TargetMessage)
 	}
