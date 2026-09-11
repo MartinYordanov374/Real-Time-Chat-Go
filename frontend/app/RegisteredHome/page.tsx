@@ -8,6 +8,8 @@ export default function page() {
   const [loading, setLoading] = useState(true)
   const [selectedChat, setSelectedChat] = useState(undefined)
   const [currentUsername, setCurrentUsername] = useState('')
+  const [selectedChatMessages, setSelectedChatMessages] = useState([])
+
   useEffect(() => {
     async function RetrieveUserChats(){
       let AllCurrentUserChats = await Axios.get('http://localhost:8080/GetAllChats', {withCredentials: true})
@@ -43,8 +45,11 @@ export default function page() {
         console.log('Socket connection established')
     }
     Socket.onmessage = (event) => {
-       let parsedData = JSON.parse(event.data)
-       console.log(parsedData)
+      let parsedData = JSON.parse(event.data)
+      setSelectedChatMessages((prevState) => [
+        ...prevState,
+        parsedData
+      ])
     }
 
     Socket.onclose = () => {
@@ -60,7 +65,7 @@ export default function page() {
     loading == false ?
     <div className="flex">
         <ChatList chats = {chats} onSelect={setSelectedChat} currentUsername={currentUsername}/>
-        <ChatBox chat = {selectedChat}/>
+        <ChatBox chat = {selectedChat} chatMessages={selectedChatMessages} setChatMessages={setSelectedChatMessages}/>
     </div>
     :
     <div>

@@ -5,10 +5,9 @@ import Axios from 'axios'
 import {useState, useEffect, useRef} from 'react'
 
 
-export default function ChatBox({chat}) {
+export default function ChatBox({chat, chatMessages, setChatMessages}) {
   let online : boolean = true
   const [message, setMessage] = useState('')
-  const [chatMessages, setChatMessages] = useState([])
   useEffect(() => {
     setChatMessages(chat?.messages ?? [])
   }, [chat])
@@ -41,7 +40,7 @@ export default function ChatBox({chat}) {
                 }
             </div>
         </div>
-        <div className='flex flex-col-reverse max-w h-screen p-10 max-h-screen overflow-scroll'>
+        <div className='flex flex-col max-w h-screen p-10 max-h-screen overflow-scroll'>
             {chatMessages.map((message) => (
                 <MessageBox 
                 content={message.textContent}

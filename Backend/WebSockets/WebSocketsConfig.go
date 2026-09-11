@@ -57,6 +57,7 @@ func (Handler *Handler) HandleWebSocketConnection(GinContext *gin.Context) {
 	Handler.Hub.RegisterClient(Client)
 	// TODO: Move the subscription out of the socket connection handler to avoid duplications
 	sub := Redis.Client.Subscribe(context.Background(), "Message")
+	defer sub.Close()
 
 	go Client.WritePump()
 	go Client.ReadPump(Handler.Hub)
