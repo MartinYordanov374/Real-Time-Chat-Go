@@ -41,8 +41,14 @@ func AuthMiddleware() gin.HandlerFunc {
 func CORSMiddleware() gin.HandlerFunc {
 	return func(GinContext *gin.Context) {
 		GinContext.Header("Access-Control-Allow-Origin", "http://localhost:3000")
-		GinContext.Header("Access-Control-Allow-Methods", "GET, POST")
+		GinContext.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		GinContext.Header("Access-Control-Allow-Headers", "Content-Type")
+		GinContext.Header("Access-Control-Allow-Credentials", "true")
+
+		if GinContext.Request.Method == "OPTIONS" {
+			GinContext.AbortWithStatus(200)
+			return
+		}
 		GinContext.Next()
 	}
 }
