@@ -116,7 +116,7 @@ export default function RegisterPage() {
             focus:ring-2 
             focus:ring-blue-500
             mb-4"
-            onChange={() => setConfirmPassword(e.target.value)}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
           <button
             type="submit"
