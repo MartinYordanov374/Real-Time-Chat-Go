@@ -5,8 +5,8 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"context"
 )
-func FindUsers(TargetUsername string) (*MongoConfig.User, error){
-var TargetUser MongoConfig.User
+func FindUsers(TargetUsername string) ([]MongoConfig.User, error){
+var TargetUsers []MongoConfig.User
 	filter := bson.M{
 		"username": bson.M{
 			"$gte": TargetUsername,
@@ -19,11 +19,16 @@ var TargetUser MongoConfig.User
 	// After the message has been sent a box appears that asks the user to wait for the other user to accept the chat request.
 	// TODO: Rewrite this to match usernames by regex or soemthing once you get the functionality working for a specific Username
 	// TODO: Do not return the entire user object, just the information necessary
-	err := GlobalVariables.MongoUsersCollection.FindOne(context.Background(), filter).Decode(&TargetUser)
-
+	cursor, err := GlobalVariables.MongoUsersCollection.Find(context.Background(), filter)
 	if err != nil {
-		return nil, err
+		return []MongoConfig.User{}, err
+	}
+	defer cursor.Close(context.Background())
+
+	err = cursor.All(context.Background(), &TargetUsers)
+	if err != nil {
+		return []MongoConfig.User{}, err
 	}
 
-	return &TargetUser, nil
+	return &TargetUsers, nil
 }
