@@ -6,9 +6,15 @@ export default function ChatList({chats, onSelect, currentUsername}) {
 
   async function FindUser(Username){
     let res = await Axios.get(`http://localhost:8080/SearchUser/${Username}`, {withCredentials: true})
+    .then((res) => {
+      console.log(res)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
   }
   useEffect(() => {
-    console.log(SoughtUsername)
+    FindUser(SoughtUsername)
     
   }, [SoughtUsername])
   return (
