@@ -4,7 +4,7 @@ import ChatList from "../ChatList/ChatList";
 import Axios from 'axios'
 import {useState, useEffect} from 'react'
 export default function page() {
-  const [chats, setChats] = useState()
+  const [chats, setChats] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedChat, setSelectedChat] = useState(undefined)
   const [currentUsername, setCurrentUsername] = useState('')
@@ -15,7 +15,6 @@ export default function page() {
       let AllCurrentUserChats = await Axios.get('http://localhost:8080/GetAllChats', {withCredentials: true})
       .then((res) =>{
         setChats(res.data?.chats)
-        RetrieveCurrentUsername()
       })
       .catch((err) => {
         console.log(err)
@@ -33,6 +32,7 @@ export default function page() {
         })
     }
     RetrieveUserChats()
+    RetrieveCurrentUsername()
   }, [])
 
 
