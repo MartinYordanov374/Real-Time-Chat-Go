@@ -237,3 +237,22 @@ func GetCurrentUserData(GinContext *gin.Context) {
 		GinContext.JSON(200, gin.H{"User": TargetUser})
 	}
 }
+
+func SearchUser(GinContext *gin.Context) {
+	var RequestBody struct {
+		Username string `json:"Username"`
+	}
+	var TargetUser MongoConfig.User
+
+	GinContext.BindJSON(&RequestBody)
+
+	filter := bson.M{"Username": RequestBody.Username}
+	err := GlobalVariables.MongoUsersCollection.FindOne(context.Background(), filter).Decode(&TargetUser)
+
+	if err != nil {
+		log.Println(err)
+		GinContext.JSON(500, gin.H{"error": err})
+	}
+
+	GinContext.JSON(200, gin.H{"User": TargetUser})
+}
