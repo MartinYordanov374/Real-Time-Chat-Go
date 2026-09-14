@@ -1,10 +1,15 @@
+import Axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
 export default function ChatList({chats, onSelect, currentUsername}) {
   const [SoughtUsername, setSoughtUsername] = useState('')
 
+  async function FindUser(Username){
+    let res = await Axios.get(`http://localhost:8080/SearchUser/${Username}`, {withCredentials: true})
+  }
   useEffect(() => {
     console.log(SoughtUsername)
+    
   }, [SoughtUsername])
   return (
     <div className="justify-left w-[50%] bg-white text-gray-900">
