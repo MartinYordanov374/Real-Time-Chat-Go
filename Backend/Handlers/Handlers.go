@@ -241,7 +241,12 @@ func GetCurrentUserData(GinContext *gin.Context) {
 func SearchUser(GinContext *gin.Context) {
 	TargetUsername := GinContext.Param("Username")
 	var TargetUser MongoConfig.User
-	filter := bson.M{"username": TargetUsername}
+	filter := bson.M{
+		"username": bson.M{
+			"$gte": TargetUsername + "\uffff",
+			"$lt":  TargetUsername + "\uffff",
+		},
+	}
 	// NOTE: This functionality should first look for the user's CONTACTS(chats with users) and then look for other users.
 	// If a user is found and they do not have a chat with them, the user's username and ID should be displayed alone in the
 	// contacts list (a username should be unique). The user is given the option to send a message to the said person.
