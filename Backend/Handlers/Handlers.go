@@ -239,19 +239,17 @@ func GetCurrentUserData(GinContext *gin.Context) {
 }
 
 func SearchUser(GinContext *gin.Context) {
-	var RequestBody struct {
-		Username string `json:"Username"`
-	}
+	TargetUsername := GinContext.Param("Username")
 	var TargetUser MongoConfig.User
-
-	GinContext.BindJSON(&RequestBody)
-
-	filter := bson.M{"Username": RequestBody.Username}
+	filter := bson.M{"username": TargetUsername}
+	// TODO: Rewrite this to match usernames by regex or soemthing once you get the functionality working for a specific Username
+	// TODO: Do not return the entire user object, just the information necessary
 	err := GlobalVariables.MongoUsersCollection.FindOne(context.Background(), filter).Decode(&TargetUser)
 
 	if err != nil {
 		log.Println(err)
 		GinContext.JSON(500, gin.H{"error": err})
+		return
 	}
 
 	GinContext.JSON(200, gin.H{"User": TargetUser})

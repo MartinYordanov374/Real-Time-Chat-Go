@@ -34,6 +34,6 @@ func main() {
 
 	router.GET("/GetAllChats", Middlewares.AuthMiddleware(), HandlerFunctions.RetrieveAllUserChats)
 	router.GET("/GetCurrentUserData", Middlewares.AuthMiddleware(), HandlerFunctions.GetCurrentUserData)
-	router.GET("/SearchUser", Middlewares.AuthMiddleware(), HandlerFunctions.SearchUser)
+	router.GET("/SearchUser/:Username", Middlewares.AuthMiddleware(), HandlerFunctions.SearchUser)
 	router.Run()
 }
