@@ -1,18 +1,19 @@
 package MongoConfig
 
-import(
-	"log"
-	"go.mongodb.org/mongo-driver/v2/mongo"
+import (
 	"RealTimeChatApp/Backend/GlobalVariables"
+	"log"
+
+	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-func ConnectToMongo() (*mongo.Client, error){
+func ConnectToMongo() (*mongo.Client, error) {
 	uri := "mongodb://mongo:27017/RTC"
 	client, err := mongo.Connect(options.Client().ApplyURI(uri))
-	if err != nil{
+	if err != nil {
 		log.Println(err)
-	}else{
+	} else {
 		log.Println("Connected to DB successfully!")
 		GlobalVariables.MongoClient = client
 		UsersCollection := GlobalVariables.MongoClient.Database("RTC").Collection("Users")
@@ -23,7 +24,13 @@ func ConnectToMongo() (*mongo.Client, error){
 		GlobalVariables.MongoChatsCollection = ChatsCollection
 		GlobalVariables.MongoMessagesCollection = MessagesCollection
 		GlobalVariables.MongoRequestsCollection = RequestsCollection
-	 }
 
-	return client, nil;
+		err := CreateUsersIndex()
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+	}
+
+	return client, nil
 }
