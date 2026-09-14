@@ -1,6 +1,11 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 export default function ChatList({chats, onSelect, currentUsername}) {
+  const [SoughtUsername, setSoughtUsername] = useState('')
+
+  useEffect(() => {
+    console.log(SoughtUsername)
+  }, [SoughtUsername])
   return (
     <div className="justify-left w-[50%] bg-white text-gray-900">
       {/* 1. User Header */}
@@ -18,7 +23,7 @@ export default function ChatList({chats, onSelect, currentUsername}) {
       <div className='p-4'>
         <input 
         className="p-4 w-full focus:outline-none bg-gray-200 rounded-xl text-sm"
-        placeholder='Find contacts by username'/>
+        placeholder='Find contacts by username' onChange={(e) => setSoughtUsername(e.target.value)}/>
       </div>
       {/* 3. Contacts List */}
       {chats.map((Chat) => (
