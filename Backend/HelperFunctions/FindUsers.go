@@ -30,5 +30,5 @@ var TargetUsers []MongoConfig.User
 		return []MongoConfig.User{}, err
 	}
 
-	return &TargetUsers, nil
+	return TargetUsers, nil
 }
