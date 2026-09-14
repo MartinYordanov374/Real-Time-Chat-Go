@@ -243,7 +243,7 @@ func SearchUser(GinContext *gin.Context) {
 	var TargetUser MongoConfig.User
 	filter := bson.M{
 		"username": bson.M{
-			"$gte": TargetUsername + "\uffff",
+			"$gte": TargetUsername,
 			"$lt":  TargetUsername + "\uffff",
 		},
 	}
