@@ -5,13 +5,19 @@ export default function ChatList({chats, onSelect, currentUsername}) {
   const [SoughtUsername, setSoughtUsername] = useState('')
 
   async function FindUser(Username){
-    let res = await Axios.get(`http://localhost:8080/SearchUser/${Username}`, {withCredentials: true})
-    .then((res) => {
-      console.log(res)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+    const filteredChats = chats?.filter((chat) =>
+      chat.DisplayedUsername.toLowerCase().includes(Username.toLowerCase())
+    )
+
+    if (filteredChats?.length < 1){
+      let res = await Axios.get(`http://localhost:8080/SearchUser/${Username}`, {withCredentials: true})
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    }
   }
   useEffect(() => {
     FindUser(SoughtUsername)
