@@ -61,7 +61,7 @@ func Register(GinContext *gin.Context) {
 	// TODO: Remove email field
 	var UserData MongoConfig.User
 	GinContext.BindJSON(&UserData)
-
+	log.Println(UserData)
 	if HelperFunctions.UsernameExists(UserData.Username) || HelperFunctions.EmailExists(UserData.Email) {
 		GinContext.JSON(200, gin.H{
 			"message": "This username or email is already taken!"})
