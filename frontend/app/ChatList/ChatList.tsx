@@ -8,8 +8,7 @@ export default function ChatList({chats, onSelect, currentUsername}) {
     const filteredChats = chats?.filter((chat) =>
       chat.DisplayedUsername.toLowerCase().includes(Username.toLowerCase())
     )
-
-    if (filteredChats?.length < 1){
+    if (filteredChats == undefined){
       let res = await Axios.get(`http://localhost:8080/SearchUser/${Username}`, {withCredentials: true})
       .then((res) => {
         console.log(res)
