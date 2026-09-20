@@ -62,6 +62,7 @@ export default function ChatList({chats, onSelect, currentUsername}) {
           <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer'>
             <div className='flex'>
               <div className=' flex size-12 rounded-full bg-blue-500 p-2 justify-center items-center text-white'>
+                    {User.username.split('')[0]}
               </div>
               <h2 className='font-semibold pl-2'>{User.username}</h2>
             </div>
