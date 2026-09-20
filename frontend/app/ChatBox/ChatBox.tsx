@@ -21,6 +21,7 @@ export default function ChatBox({chat, chatMessages, setChatMessages}) {
         console.log(err)
     })
   }
+// TODO: Add a view for the non-contact chat
   return (
     chat == undefined ?
     <div className="flex h-screen flex-col w-full bg-gray-100">
