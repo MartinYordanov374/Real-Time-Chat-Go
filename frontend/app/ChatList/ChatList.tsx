@@ -3,25 +3,38 @@ import React, { useEffect, useState } from 'react'
 
 export default function ChatList({chats, onSelect, currentUsername}) {
   const [SoughtUsername, setSoughtUsername] = useState('')
+  const [DisplayedChats, setDisplayedChats] = useState([])
 
   async function FindUser(Username){
+    if (Username.trim() == ''){
+        setDisplayedChats(chats)
+        return
+    }
     const filteredChats = chats?.filter((chat) =>
       chat.DisplayedUsername.toLowerCase().includes(Username.toLowerCase())
     )
-    if (filteredChats == undefined){
+    if (filteredChats == undefined || filteredChats.length < 1){
       let res = await Axios.get(`http://localhost:8080/SearchUser/${Username}`, {withCredentials: true})
       .then((res) => {
         console.log(res)
+        setDisplayedChats(res.data.User)
       })
       .catch((err) => {
         console.log(err)
       })
     }
+    else{
+        setDisplayedChats(filteredChats)
+    }
   }
   useEffect(() => {
     FindUser(SoughtUsername)
-    
   }, [SoughtUsername])
+
+  useEffect(() => {
+    setDisplayedChats(chats)
+    console.log(chats)
+  }, [])
   return (
     <div className="justify-left w-[50%] bg-white text-gray-900">
       {/* 1. User Header */}
@@ -33,8 +46,7 @@ export default function ChatList({chats, onSelect, currentUsername}) {
           <span className='font-bold'>{currentUsername}</span>
           <span className='text-sm text-gray-400 pt-0'>Online</span>
         </div>
-      </div>  
-      {/* TODO: Implement search existing AND new contacts */}
+      </div>
       {/* 2. Search Bar */}
       <div className='p-4'>
         <input 
@@ -42,10 +54,14 @@ export default function ChatList({chats, onSelect, currentUsername}) {
         placeholder='Find contacts by username' onChange={(e) => setSoughtUsername(e.target.value)}/>
       </div>
       {/* 3. Contacts List */}
+          // TODO: If the sought user is not a contact yet, display their username
+          // TODO: Upon selecting the username, a user box shows like a chat box and prompts the searcher
+          // TODO: To send the sought user a message.
+
       <div>
-        {chats == undefined ? 
+        {DisplayedChats == undefined ?
         <div className='flex justify-center'> You do not have contacts yet </div> : 
-          chats.map((Chat) => (
+          DisplayedChats.map((Chat) => (
             <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer' onClick={() => onSelect(Chat)} key={Chat.id}>
               <div className='flex'>
                 <div className=' flex size-12 rounded-full bg-blue-500 p-2 justify-center items-center text-white'>
@@ -53,11 +69,11 @@ export default function ChatList({chats, onSelect, currentUsername}) {
                 </div>
                 <h2 className='font-semibold pl-2'>{Chat.DisplayedUsername}</h2>
                 {/* TODO: for mobile resolutions, move the timestamp under the message*/}
-                <p className='ml-auto text-gray-400 text-sm'>{Chat.messages[0].timeStamp}</p>
+                  <p className='ml-auto text-gray-400 text-sm'>{Chat.messages[0].timeStamp}</p>
               </div>
               {/* TODO: Cut out the message after a certain length */}
               <div className='flex-row'>
-                <p className='text-sm'>{Chat.messages[0].textContent}</p>
+                  <p className='text-sm'>{Chat.messages[0].textContent}</p>
               </div>
             </div>
           ))}
