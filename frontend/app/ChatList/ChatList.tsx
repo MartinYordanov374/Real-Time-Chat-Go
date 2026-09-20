@@ -8,6 +8,7 @@ export default function ChatList({chats, onSelect, currentUsername}) {
   async function FindUser(Username){
     if (Username.trim() == ''){
         setDisplayedChats(chats)
+        setDisplayedUsers([])
         return
     }
     const filteredChats = chats?.filter((chat) =>
@@ -55,11 +56,8 @@ export default function ChatList({chats, onSelect, currentUsername}) {
         placeholder='Find contacts by username' onChange={(e) => setSoughtUsername(e.target.value)}/>
       </div>
       {/* 3. Contacts List */}
-          // TODO: If the sought user is not a contact yet, display their username
-          // TODO: Upon selecting the username, a user box shows like a chat box and prompts the searcher
-          // TODO: To send the sought user a message.
       <div>
-        {DisplayedUsers.length > 0 ? 
+        {DisplayedUsers?.length > 0 ?
          DisplayedUsers.map((User) => (
           <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer'>
             <div className='flex'>
