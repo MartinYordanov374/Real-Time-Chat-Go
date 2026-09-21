@@ -5,7 +5,7 @@ import Axios from 'axios'
 import {useState, useEffect} from 'react'
 import {Message} from '@/Types/Types'
 
-export default function ChatBox({chat, chatMessages, setChatMessages}) {
+export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
   let online : boolean = true
   const [message, setMessage] = useState<string>('')
   useEffect(() => {

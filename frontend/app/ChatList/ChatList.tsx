@@ -1,7 +1,7 @@
 import Axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
-export default function ChatList({chats, onSelect, currentUsername}) {
+export default function ChatList({chats, onSelectChat, currentUsername, onSelectUser}) {
   const [SoughtUsername, setSoughtUsername] = useState('')
   const [DisplayedChats, setDisplayedChats] = useState([])
   const [DisplayedUsers, setDisplayedUsers] = useState([])
@@ -59,7 +59,7 @@ export default function ChatList({chats, onSelect, currentUsername}) {
       <div>
         {DisplayedUsers?.length > 0 ?
          DisplayedUsers.map((User) => (
-          <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer'>
+          <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer' onSelect={()=>onSelectUser(User)}>
             <div className='flex'>
               <div className=' flex size-12 rounded-full bg-blue-500 p-2 justify-center items-center text-white'>
                     {User.username.split('')[0]}
@@ -72,7 +72,7 @@ export default function ChatList({chats, onSelect, currentUsername}) {
           (DisplayedChats == undefined ?
           <div className='flex justify-center'> You do not have contacts yet </div> : 
             DisplayedChats.map((Chat) => (
-              <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer' onClick={() => onSelect(Chat)} key={Chat.id}>
+              <div className='flex flex-col gap-2 p-4 hover:bg-gray-100 cursor-pointer' onClick={() => onSelectChat(Chat)} key={Chat.id}>
                 <div className='flex'>
                   <div className=' flex size-12 rounded-full bg-blue-500 p-2 justify-center items-center text-white'>
                     {Chat.DisplayedUsername.split('')[0]}

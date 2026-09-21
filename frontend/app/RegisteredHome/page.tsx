@@ -9,7 +9,7 @@ export default function page() {
   const [selectedChat, setSelectedChat] = useState(undefined)
   const [currentUsername, setCurrentUsername] = useState('')
   const [selectedChatMessages, setSelectedChatMessages] = useState([])
-
+  const [selectedUser, setSelectedUser] = useState(undefined)
   useEffect(() => {
     async function RetrieveUserChats(){
       let AllCurrentUserChats = await Axios.get('http://localhost:8080/GetAllChats', {withCredentials: true})
@@ -65,8 +65,8 @@ export default function page() {
   return (
     loading == false ?
     <div className="flex">
-        <ChatList chats = {chats} onSelect={setSelectedChat} currentUsername={currentUsername}/>
-        <ChatBox chat = {selectedChat} chatMessages={selectedChatMessages} setChatMessages={setSelectedChatMessages}/>
+        <ChatList chats = {chats} onSelectChat={setSelectedChat} currentUsername={currentUsername} onSelectUser={setSelectedUser}/>
+        <ChatBox chat = {selectedChat} chatMessages={selectedChatMessages} setChatMessages={setSelectedChatMessages} user={selectedUser}/>
     </div>
     :
     <div>
