@@ -10,6 +10,7 @@ export default function page() {
   const [currentUsername, setCurrentUsername] = useState('')
   const [selectedChatMessages, setSelectedChatMessages] = useState([])
   const [selectedUser, setSelectedUser] = useState(undefined)
+
   useEffect(() => {
     async function RetrieveUserChats(){
       let AllCurrentUserChats = await Axios.get('http://localhost:8080/GetAllChats', {withCredentials: true})
@@ -34,7 +35,6 @@ export default function page() {
     RetrieveUserChats()
     RetrieveCurrentUsername()
   }, [])
-
 
   useEffect(() => {
     if (!selectedChat?.id){ 
