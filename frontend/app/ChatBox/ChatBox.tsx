@@ -11,9 +11,14 @@ export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
   useEffect(() => {
     setChatMessages(chat?.messages ?? [])
   }, [chat])
-
+  useEffect(() => {
+      console.log(user)
+  }, [user])
   async function SendMessage(){
-    let res = await Axios.post(`http://localhost:8080/SendMessage/${chat.receiverId}`, {"TextContent": message}, {withCredentials: true})
+    let URI = user ? `http://localhost:8080/SendMessage/${user.id}`
+ : `http://localhost:8080/SendMessage/${chat.receiverId}`
+    let res = await Axios.post(URI, {"TextContent": message}, {withCredentials: true})
+
     .then((res) => {
         console.log(res)
     })
