@@ -21,6 +21,9 @@ export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
         console.log(err)
     })
   }
+  useEffect(() => {
+      console.log(user)
+  }, [user])
 // TODO: Add a view for the non-contact chat
   return (
     chat == undefined ?
@@ -28,6 +31,7 @@ export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
         <div className='flex flex-1 justify-center items-center'>Start or select a chat and it will appear here</div>
     </div>
     :
+    (user == undefined ?
     <div className="flex h-screen flex-col w-full bg-gray-100">
         <div className='sticky top-0 bg-white flex p-4'>
             <div className='flex size-12 rounded-full bg-blue-500 p-4 justify-center items-center text-white'>{chat.DisplayedUsername.split('')[0]}</div>
@@ -70,5 +74,8 @@ export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
             </div>
         </div>
     </div>
+        :
+"displaying selected user info"
+    )
   )
 }
