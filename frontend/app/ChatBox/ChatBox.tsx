@@ -11,9 +11,7 @@ export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
   useEffect(() => {
     setChatMessages(chat?.messages ?? [])
   }, [chat])
-  useEffect(() => {
-      console.log(user)
-  }, [user])
+
   async function SendMessage(){
     let URI = user ? `http://localhost:8080/SendMessage/${user.id}`
  : `http://localhost:8080/SendMessage/${chat.receiverId}`
@@ -26,9 +24,6 @@ export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
         console.log(err)
     })
   }
-  useEffect(() => {
-      console.log(user)
-  }, [user])
 // TODO: Add a view for the non-contact chat
   return (
     chat == undefined ?
