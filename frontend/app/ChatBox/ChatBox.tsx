@@ -75,7 +75,45 @@ export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
         </div>
     </div>
         :
-"displaying selected user info"
+    <div className="flex h-screen flex-col w-full bg-gray-100">
+        <div className='sticky top-0 bg-white flex p-4'>
+            <div className='flex size-12 rounded-full bg-blue-500 p-4 justify-center items-center text-white'>{user.username.split('')[0]}</div>
+            <div className='flex-col'>
+                <h2 className='text-gray-900 pl-4'>{user.username}</h2>
+                {online
+                    ?
+                    <p className='text-emerald-500 font-bold pl-4 pb-4'> Online </p>
+                    :
+                    <p className='text-gray-400 pl-4 pb-4'> Offline </p>
+                }
+            </div>
+        </div>
+        <div className='flex flex-col-reverse max-w h-screen p-10 max-h-screen overflow-scroll'/>
+        <div className='sticky bottom-0 bg-white p-4 gap-2'>
+            <div className='flex items-end bg-gray-200 rounded-lg text-gray-900 p-4 flex-1'>
+                <textarea
+                className='
+                w-full
+                resize-none
+                focus:outline-none
+                p-2'
+                placeholder='Send a message to start the conversation'
+                onChange={(e) => setMessage(e.target.value)}/>
+
+                <button className='
+                text-blue-500
+                hover:cursor-pointer
+                hover:text-blue-600
+                flex size-10'
+                onClick={() => SendMessage()}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                        <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
     )
   )
 }
