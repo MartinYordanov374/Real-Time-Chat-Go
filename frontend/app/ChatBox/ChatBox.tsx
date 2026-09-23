@@ -11,7 +11,12 @@ export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
   useEffect(() => {
     setChatMessages(chat?.messages ?? [])
   }, [chat])
-
+ // TODO: Test the send message function for the non-contacts.
+ // 1. If a non-contact is sent a message, then they should receive a notification in their inbox
+ // 2. A chatbox should appear for the receiver and sender user with the said chat
+ // 3. A "request is pending" field should appear for the sender and they shall not be able to send any more messages until the receiver accepts their request
+ // 4. Upon opening the chat request chatbox, the receiver can either accept or reject the request. If a request is rejected, the chat is deleted for both users.
+ // 5. Test if there are any bugs when a user sends a message to a non-contact and then attempts to message a contact.
   async function SendMessage(){
     let URI = user ? `http://localhost:8080/SendMessage/${user.id}`
  : `http://localhost:8080/SendMessage/${chat.receiverId}`
@@ -24,7 +29,6 @@ export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
         console.log(err)
     })
   }
-// TODO: Add a view for the non-contact chat
   return (
     chat == undefined ?
     <div className="flex h-screen flex-col w-full bg-gray-100">
