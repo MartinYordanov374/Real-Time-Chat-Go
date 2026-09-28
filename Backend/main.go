@@ -22,6 +22,7 @@ func main() {
 	WebSocketsHub := WebSockets.NewHub()
 	WebSocketsHandler := WebSockets.CreateHandler(WebSocketsHub)
 	go Redis.RedisMessageSubscribeHandler(WebSocketsHub)
+	go Redis.RedisRequestsSubscribeHandler(WebSocketsHub)
 	router.POST("/login", HandlerFunctions.Login)
 	router.POST("/register", HandlerFunctions.Register)
 	router.POST("/logout", Middlewares.AuthMiddleware(), HandlerFunctions.Logout)
