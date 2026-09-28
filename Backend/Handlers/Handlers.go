@@ -129,9 +129,19 @@ func SendMessage(GinContext *gin.Context) {
 				if HelperFunctions.UserExistsByID(ConvertedReceiverID) {
 					if !HelperFunctions.ChatRequestSent(SenderID, ConvertedReceiverID) {
 						HelperFunctions.SendChatRequest(SenderID, ConvertedReceiverID)
-						HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
+						ChatObject := HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
+						MarshaledData, err := json.Marshal(ChatObject)
+						if err != nil {
+							log.Println(err)
+							return
+						}
 						CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
 						HelperFunctions.CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
+						pubSubErr := Redis.Client.Publish(context.Background(), "Request", MarshaledData).Err()
+						if pubSubErr != nil {
+							log.Println(pubSubErr)
+							return
+						}
 						GinContext.JSON(200, gin.H{"message": "The message request has been sent"})
 					} else {
 						RequestStatus := HelperFunctions.GetChatRequestStatus(SenderID, ConvertedReceiverID)

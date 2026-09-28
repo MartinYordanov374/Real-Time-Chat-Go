@@ -27,3 +27,23 @@ func RedisMessageSubscribeHandler(Hub *WebSockets.Hub) {
 		WebSockets.SendMessageToClient(Hub, PayloadData)
 	}
 }
+
+func RedisRequestsSubscribeHandler(Hub *WebSockets.Hub) {
+	sub := Client.Subscribe(context.Background(), "Request")
+	defer sub.Close()
+	for {
+		msg, err := sub.ReceiveMessage(context.Background())
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		var PayloadData MongoConfig.Chat
+		err = json.Unmarshal([]byte(msg.Payload), &PayloadData)
+		if err != nil {
+			log.Println(err)
+		}
+
+		WebSockets.SendRequestToClient(Hub, PayloadData)
+	}
+}

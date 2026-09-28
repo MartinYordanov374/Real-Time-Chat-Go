@@ -103,3 +103,17 @@ func SendMessageToClient(Hub *Hub, MessageObject MongoConfig.Message) {
 		}
 	}
 }
+
+
+func SendRequestToClient(Hub *Hub, ChatObject MongoConfig.Chat) {
+	// TODO: Find a way to make this O(1)
+	MarshaledData, err := json.Marshal(ChatObject)
+	if err != nil {
+		log.Println(err)
+	}
+	for client := range Hub.ActiveClients {
+		if client.UserID == ChatObject.CreatorID || client.UserID == ChatObject.ReceiverID {
+			client.SendChannel <- MarshaledData
+		}
+	}
+}

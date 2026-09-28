@@ -25,7 +25,7 @@ func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bo
 	}
 }
 
-func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) {
+func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) MongoConfig.Chat {
 	newChat := MongoConfig.Chat{
 		CreatorID:    CreatorID,
 		ReceiverID:   ReceiverID,
@@ -36,8 +36,10 @@ func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) {
 
 	if err != nil {
 		log.Println(err)
+		return MongoConfig.Chat{}
 	} else {
 		log.Println("Successfully created chat between the users")
+		return newChat
 	}
 }
 
