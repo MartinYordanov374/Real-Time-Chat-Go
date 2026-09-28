@@ -17,7 +17,10 @@ export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
  // 3. A "request is pending" field should appear for the sender and they shall not be able to send any more messages until the receiver accepts their request
  // 4. Upon opening the chat request chatbox, the receiver can either accept or reject the request. If a request is rejected, the chat is deleted for both users.
  // 5. Test if there are any bugs when a user sends a message to a non-contact and then attempts to message a contact.
-  async function SendMessage(){
+ useEffect(() => {
+    console.log('user selected! ', user)
+ }, [user])
+ async function SendMessage(){
     let URI = user ? `http://localhost:8080/SendMessage/${user.id}`
  : `http://localhost:8080/SendMessage/${chat.receiverId}`
     let res = await Axios.post(URI, {"TextContent": message}, {withCredentials: true})
@@ -30,7 +33,7 @@ export default function ChatBox({chat, chatMessages, setChatMessages, user}) {
     })
   }
   return (
-    chat == undefined ?
+    chat == undefined && user == undefined ?
     <div className="flex h-screen flex-col w-full bg-gray-100">
         <div className='flex flex-1 justify-center items-center'>Start or select a chat and it will appear here</div>
     </div>

@@ -45,6 +45,7 @@ export default function page() {
         console.log('Socket connection established')
     }
     Socket.onmessage = (event) => {
+      console.log(event)
       let parsedData = JSON.parse(event.data)
       setSelectedChatMessages((prevState) => [
         parsedData,
@@ -61,6 +62,10 @@ export default function page() {
       Socket.close()
     }
   }, [selectedChat?.id])
+
+  useEffect(() => {
+      console.log(selectedUser)
+  }, [selectedUser])
 
   return (
     loading == false ?
