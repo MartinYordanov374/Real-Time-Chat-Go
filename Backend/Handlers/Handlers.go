@@ -132,6 +132,7 @@ func SendMessage(GinContext *gin.Context) {
 						HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
 						CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
 						HelperFunctions.CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
+						GinContext.JSON(200, gin.H{"message": "The message request has been sent"})
 					} else {
 						RequestStatus := HelperFunctions.GetChatRequestStatus(SenderID, ConvertedReceiverID)
 						if RequestStatus == MongoConfig.RequestAccepted {
@@ -141,11 +142,15 @@ func SendMessage(GinContext *gin.Context) {
 							MarshaledData, err := json.Marshal(MessageObject)
 							if err != nil {
 								log.Println(err)
+								return
 							}
 							pubSubErr := Redis.Client.Publish(context.Background(), "Message", MarshaledData).Err()
 							if pubSubErr != nil {
 								log.Println(pubSubErr)
+								return
 							}
+							GinContext.JSON(200, gin.H{"message": "The message has been sent"})
+
 						} else if RequestStatus == MongoConfig.RequestPending {
 							GinContext.JSON(202, gin.H{"message": "The request hasn't been answered yet. You can only send one message before a request is approved."})
 						} else {
