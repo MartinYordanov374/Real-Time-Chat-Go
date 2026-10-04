@@ -25,7 +25,7 @@ func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bo
 	}
 }
 
-func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) MongoConfig.Chat {
+func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID, InitialMessage string) MongoConfig.Chat {
 	newChat := MongoConfig.Chat{
 		ID: bson.NewObjectID(),
 		CreatorID:    CreatorID,
@@ -40,6 +40,8 @@ func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) MongoCo
 		return MongoConfig.Chat{}
 	} else {
 		log.Println("Successfully created chat between the users")
+		MessageObject := CreateMessageObject(CreatorID, ReceiverID, newChat.ID, InitialMessage)
+		newChat.Messages = append(newChat.Messages, MessageObject)
 		log.Println(newChat)
 		return newChat
 	}
@@ -336,14 +338,14 @@ func FetchLatestMessagesFromDB(ChatID bson.ObjectID) ([]MongoConfig.Message, err
 
 func SendInitialMessage(SenderID bson.ObjectID, ConvertedReceiverID bson.ObjectID, RequestBody MongoConfig.Message) GlobalVariables.MessageResponse {
 		SendChatRequest(SenderID, ConvertedReceiverID)
-		ChatObject := CreateChatObject(SenderID, ConvertedReceiverID)
+		ChatObject := CreateChatObject(SenderID, ConvertedReceiverID, RequestBody.TextContent)
 		MarshaledData, err := json.Marshal(ChatObject)
 		if err != nil {
 			log.Println(err)
 			return GlobalVariables.MessageResponse{500, "An error occurred when marshaling the chat object"}
 		}
 		CurrentChatID := RetrieveChatID(SenderID, ConvertedReceiverID)
-		CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
+	    CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
 		pubSubErr := Redis.Client.Publish(context.Background(), "Request", MarshaledData).Err()
 		if pubSubErr != nil {
 			log.Println(pubSubErr)
@@ -351,7 +353,6 @@ func SendInitialMessage(SenderID bson.ObjectID, ConvertedReceiverID bson.ObjectI
 		}
 		return GlobalVariables.MessageResponse{200,  "The message request has been sent"}
 }
-
 
 func SendRegularMessage(SenderID bson.ObjectID, ConvertedReceiverID bson.ObjectID, RequestBody MongoConfig.Message) GlobalVariables.MessageResponse {
 		CurrentChatID := RetrieveChatID(SenderID, ConvertedReceiverID)
