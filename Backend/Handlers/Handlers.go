@@ -128,6 +128,7 @@ func SendMessage(GinContext *gin.Context) {
 			} else {
 				if HelperFunctions.UserExistsByID(ConvertedReceiverID) {
 					if !HelperFunctions.ChatRequestSent(SenderID, ConvertedReceiverID) {
+						// SendInitialMessage(SenderID, ConvertedReceiverID
 						HelperFunctions.SendChatRequest(SenderID, ConvertedReceiverID)
 						ChatObject := HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
 						MarshaledData, err := json.Marshal(ChatObject)
@@ -146,6 +147,7 @@ func SendMessage(GinContext *gin.Context) {
 					} else {
 						RequestStatus := HelperFunctions.GetChatRequestStatus(SenderID, ConvertedReceiverID)
 						if RequestStatus == MongoConfig.RequestAccepted {
+							// SendRegularMessage(SenderID, ConvertedReceiverID)
 							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
 							MessageObject := HelperFunctions.CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
 							HelperFunctions.CacheMessageRedis(MessageObject)

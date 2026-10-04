@@ -18,3 +18,8 @@ type RedisMessage struct {
 	SenderID bson.ObjectID `json:"SenderID"`
 	Content string		 `json:"Content"`
 }
+
+type MessageResponse struct {
+	StatusCode int `json:StatusCode`
+	ResponseMessage string `json:ResponseMessage`
+}

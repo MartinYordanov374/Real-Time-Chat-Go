@@ -331,3 +331,21 @@ func FetchLatestMessagesFromDB(ChatID bson.ObjectID) ([]MongoConfig.Message, err
 	return TargetMessages, nil
 
 }
+
+func SendInitialMessage(SenderID bson.ObjectID, ConvertedReceiverID bson.ObjectID, RequestBody MongoConfig.Message) GlobalVariables.MessageResponse {
+		SendChatRequest(SenderID, ConvertedReceiverID)
+		ChatObject := CreateChatObject(SenderID, ConvertedReceiverID)
+		MarshaledData, err := json.Marshal(ChatObject)
+		if err != nil {
+			log.Println(err)
+			return GlobalVariables.MessageResponse{500, "An error occurred when marshaling the chat object"}
+		}
+		CurrentChatID := RetrieveChatID(SenderID, ConvertedReceiverID)
+		CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
+		pubSubErr := Redis.Client.Publish(context.Background(), "Request", MarshaledData).Err()
+		if pubSubErr != nil {
+			log.Println(pubSubErr)
+			return GlobalVariables.MessageResponse{500, "An error occurred when publishing the Redis request event"}
+		}
+		return GlobalVariables.MessageResponse{200,  "The message request has been sent"}
+}
