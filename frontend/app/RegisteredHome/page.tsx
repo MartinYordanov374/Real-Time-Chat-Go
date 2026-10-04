@@ -72,16 +72,20 @@ export default function page() {
     }
     Socket.onmessage = (event) => {
       let parsedData = JSON.parse(event.data)
-      console.log('Setting Chat data')
-      // TODO: Fix the initial double rendering of items when a chat request shows
-      // I think it may have something to do with more than one web socket connection being open
-      // at a time for the same user
-
       setChats((prevState) => [
           parsedData,
           ...prevState
       ])
     }
+
+    Socket.onclose = () => {
+        console.log('socket connection closed')
+    }
+
+    return () => {
+      Socket.close()
+    }
+
 
   }, [])
 
