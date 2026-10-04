@@ -42,7 +42,19 @@ func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID, Initial
 		log.Println("Successfully created chat between the users")
 		MessageObject := CreateMessageObject(CreatorID, ReceiverID, newChat.ID, InitialMessage)
 		newChat.Messages = append(newChat.Messages, MessageObject)
-		log.Println(newChat)
+		// TODO: The logic for this is not quite right.
+		// The current user making the send request is also the sender(always)
+		// However, the displayed name should be the other user's username
+		// The redis publishing happens immediately and the said chat data is
+		// sent over the respective socket channel of the receiver user.
+		// Therefore, this is not where the logic should be
+		// TODO: Figure out where to put the logic for the displayed name
+		// DO NOT PUT IT ON THE FRONTEND
+		DisplayedUsername, err := GetUserData(CreatorID)
+		if err != nil{
+			panic(err)
+		}
+		newChat.DisplayedUsername = DisplayedUsername
 		return newChat
 	}
 }

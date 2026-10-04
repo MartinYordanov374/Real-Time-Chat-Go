@@ -136,7 +136,6 @@ func SendMessage(GinContext *gin.Context) {
 						if RequestStatus == MongoConfig.RequestAccepted {
 							MessageResponseObject := HelperFunctions.SendRegularMessage(SenderID, ConvertedReceiverID, RequestBody)
 							GinContext.JSON(MessageResponseObject.StatusCode, gin.H{"message": MessageResponseObject.ResponseMessage})
-
 						} else if RequestStatus == MongoConfig.RequestPending {
 							GinContext.JSON(202, gin.H{"message": "The request hasn't been answered yet. You can only send one message before a request is approved."})
 						} else {
@@ -151,6 +150,7 @@ func SendMessage(GinContext *gin.Context) {
 		}
 	}
 }
+
 
 func AcceptChatRequest(GinContext *gin.Context) {
 	RequestID := GinContext.Param("RequestID")
