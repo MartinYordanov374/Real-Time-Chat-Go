@@ -43,7 +43,7 @@ func RedisRequestsSubscribeHandler(Hub *WebSockets.Hub) {
 		if err != nil {
 			log.Println(err)
 		}
-
+		log.Println(PayloadData)
 		WebSockets.SendRequestToClient(Hub, PayloadData)
 	}
 }

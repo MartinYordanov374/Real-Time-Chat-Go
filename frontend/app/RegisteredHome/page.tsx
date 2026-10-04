@@ -64,8 +64,16 @@ export default function page() {
   }, [selectedChat?.id])
 
   useEffect(() => {
-      console.log(selectedUser)
-  }, [selectedUser])
+    const Socket = new WebSocket("ws://localhost:8080/ws")
+    Socket.onopen = () => {
+        console.log('Socket connection established')
+    }
+    Socket.onmessage = (event) => {
+      let parsedData = JSON.parse(event.data)
+      console.log(parsedData)
+    }
+
+  }, [])
 
   return (
     loading == false ?

@@ -27,6 +27,7 @@ func ChatExistsBetweenUsers(SenderID bson.ObjectID, ReceiverID bson.ObjectID) bo
 
 func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) MongoConfig.Chat {
 	newChat := MongoConfig.Chat{
+		ID: bson.NewObjectID(),
 		CreatorID:    CreatorID,
 		ReceiverID:   ReceiverID,
 		CreationDate: time.Now(),
@@ -39,6 +40,7 @@ func CreateChatObject(CreatorID bson.ObjectID, ReceiverID bson.ObjectID) MongoCo
 		return MongoConfig.Chat{}
 	} else {
 		log.Println("Successfully created chat between the users")
+		log.Println(newChat)
 		return newChat
 	}
 }
