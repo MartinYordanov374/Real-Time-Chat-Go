@@ -367,6 +367,6 @@ func SendRegularMessage(SenderID bson.ObjectID, ConvertedReceiverID bson.ObjectI
 			return GlobalVariables.MessageResponse{500, "An error occurred when publishing the Redis message event"}
 		}
 
-		return GlobalVariables.MessageResponse{200,  "The message request has been sent"}
+		return GlobalVariables.MessageResponse{200,  "The message has been sent"}
 
 }
