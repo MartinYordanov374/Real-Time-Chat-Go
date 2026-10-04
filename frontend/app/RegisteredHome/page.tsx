@@ -15,7 +15,9 @@ export default function page() {
     async function RetrieveUserChats(){
       let AllCurrentUserChats = await Axios.get('http://localhost:8080/GetAllChats', {withCredentials: true})
       .then((res) =>{
-        setChats(res.data?.chats)
+          if (res.data != null && res.data.chats != null){
+            setChats(res.data.chats)
+        }
       })
       .catch((err) => {
         console.log(err)
@@ -70,7 +72,15 @@ export default function page() {
     }
     Socket.onmessage = (event) => {
       let parsedData = JSON.parse(event.data)
-      console.log(parsedData)
+      console.log('Setting Chat data')
+      // TODO: Fix the initial double rendering of items when a chat request shows
+      // I think it may have something to do with more than one web socket connection being open
+      // at a time for the same user
+
+      setChats((prevState) => [
+          parsedData,
+          ...prevState
+      ])
     }
 
   }, [])

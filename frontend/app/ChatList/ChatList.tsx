@@ -35,8 +35,7 @@ export default function ChatList({chats, onSelectChat, currentUsername, onSelect
 
   useEffect(() => {
     setDisplayedChats(chats)
-    console.log(chats)
-  }, [])
+  }, [chats])
   return (
     <div className="justify-left w-[50%] bg-white text-gray-900">
       {/* 1. User Header */}
