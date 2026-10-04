@@ -349,3 +349,24 @@ func SendInitialMessage(SenderID bson.ObjectID, ConvertedReceiverID bson.ObjectI
 		}
 		return GlobalVariables.MessageResponse{200,  "The message request has been sent"}
 }
+
+
+func SendRegularMessage(SenderID bson.ObjectID, ConvertedReceiverID bson.ObjectID, RequestBody MongoConfig.Message) GlobalVariables.MessageResponse {
+		CurrentChatID := RetrieveChatID(SenderID, ConvertedReceiverID)
+		MessageObject := CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
+		CacheMessageRedis(MessageObject)
+		MarshaledData, err := json.Marshal(MessageObject)
+		if err != nil {
+			log.Println(err)
+			return GlobalVariables.MessageResponse{500, "An error occurred when marshaling the chat object"}
+
+		}
+		pubSubErr := Redis.Client.Publish(context.Background(), "Message", MarshaledData).Err()
+		if pubSubErr != nil {
+			log.Println(pubSubErr)
+			return GlobalVariables.MessageResponse{500, "An error occurred when publishing the Redis message event"}
+		}
+
+		return GlobalVariables.MessageResponse{200,  "The message request has been sent"}
+
+}

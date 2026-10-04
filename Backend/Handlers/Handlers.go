@@ -128,40 +128,14 @@ func SendMessage(GinContext *gin.Context) {
 			} else {
 				if HelperFunctions.UserExistsByID(ConvertedReceiverID) {
 					if !HelperFunctions.ChatRequestSent(SenderID, ConvertedReceiverID) {
-						// SendInitialMessage(SenderID, ConvertedReceiverID
-						HelperFunctions.SendChatRequest(SenderID, ConvertedReceiverID)
-						ChatObject := HelperFunctions.CreateChatObject(SenderID, ConvertedReceiverID)
-						MarshaledData, err := json.Marshal(ChatObject)
-						if err != nil {
-							log.Println(err)
-							return
-						}
-						CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
-						HelperFunctions.CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
-						pubSubErr := Redis.Client.Publish(context.Background(), "Request", MarshaledData).Err()
-						if pubSubErr != nil {
-							log.Println(pubSubErr)
-							return
-						}
-						GinContext.JSON(200, gin.H{"message": "The message request has been sent"})
+						MessageResponseObject := HelperFunctions.SendInitialMessage(SenderID, ConvertedReceiverID, RequestBody)
+						GinContext.JSON(MessageResponseObject.StatusCode, gin.H{"message": MessageResponseObject.ResponseMessage})
+
 					} else {
 						RequestStatus := HelperFunctions.GetChatRequestStatus(SenderID, ConvertedReceiverID)
 						if RequestStatus == MongoConfig.RequestAccepted {
-							// SendRegularMessage(SenderID, ConvertedReceiverID)
-							CurrentChatID := HelperFunctions.RetrieveChatID(SenderID, ConvertedReceiverID)
-							MessageObject := HelperFunctions.CreateMessageObject(SenderID, ConvertedReceiverID, CurrentChatID, RequestBody.TextContent)
-							HelperFunctions.CacheMessageRedis(MessageObject)
-							MarshaledData, err := json.Marshal(MessageObject)
-							if err != nil {
-								log.Println(err)
-								return
-							}
-							pubSubErr := Redis.Client.Publish(context.Background(), "Message", MarshaledData).Err()
-							if pubSubErr != nil {
-								log.Println(pubSubErr)
-								return
-							}
-							GinContext.JSON(200, gin.H{"message": "The message has been sent"})
+							MessageResponseObject := HelperFunctions.SendRegularMessage(SenderID, ConvertedReceiverID, RequestBody)
+							GinContext.JSON(MessageResponseObject.StatusCode, gin.H{"message": MessageResponseObject.ResponseMessage})
 
 						} else if RequestStatus == MongoConfig.RequestPending {
 							GinContext.JSON(202, gin.H{"message": "The request hasn't been answered yet. You can only send one message before a request is approved."})
