@@ -23,7 +23,9 @@
 9. [Improvement Areas](#Improvement-Areas)
 
 ## The motivation behind the project
+A couple of months ago I decided I wanted to learn Go, so I built a static load balancer. I saw that Go is very good for writing fast-executing and efficient code, so I decided to build a bigger project with Go - a real-time chat application.
 ## What I strived to achieve and learn through this project
+The goals of this project were to learn how to write an efficient backend in Go, implement REST APIs in Go, learn Redis pub/sub, improve my system design skills, and improve my overall Go programming skills.
 ## Project Features
 ## Project Architecture
 ## Project Structure
