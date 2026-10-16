@@ -59,6 +59,10 @@ The goals of this project were to learn how to write an efficient backend in Go,
     - The login system features email validity checks, password complexity checks, and username availability checks.
 
 ## Project Architecture
+<img width="1168" height="767" alt="Screenshot_20261016_015359" src="https://github.com/user-attachments/assets/a9496a85-1fdc-4b78-a638-7456ca976f58" />
+<img width="852" height="544" alt="Screenshot_20261015_225102" src="https://github.com/user-attachments/assets/be498c7a-2f79-4ce5-8ae2-ed270bf46c11" />
+<img width="883" height="531" alt="Screenshot_20261015_232850" src="https://github.com/user-attachments/assets/7530c374-c1c4-4170-ae4c-102bbab994cc" />
+
 ## Project Structure
 ## Getting Started
 ## Improvement Areas
