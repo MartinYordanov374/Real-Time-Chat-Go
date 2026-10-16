@@ -68,7 +68,11 @@ Upon successful login, a user opens two web socket channels — one for messagin
 The diagram depicts the flow of User A sending User B a message via the `/SendMessage` endpoint. The message object is cached in the Redis database and stored in the Mongo database, which acts as the permanent source of truth. This is to ensure that even if the recipient is not online at the time when a message is sent, they will still be able to read the messages when they come back. Next, the backend publishes a “Message” event, which is forwarded to the users subscribed to this topic. The message reaches the recipient via the socket read channels. If the ConversationID within the Redis “Message” event object matches a ConversationID that a user is a part of, then it is sent to them. That way nobody else but the intended recipient receives the message. Note that the message that the user sent is also sent to their socket channel to ensure that they also see the message in the chat in real time. A similar flow is used when a user sends the first message to another user, i.e., a chat request is sent.
 
 <img width="1168" height="767" alt="Screenshot_20261016_015359" src="https://github.com/user-attachments/assets/a9496a85-1fdc-4b78-a638-7456ca976f58" />
-<img width="852" height="544" alt="Screenshot_20261015_225102" src="https://github.com/user-attachments/assets/be498c7a-2f79-4ce5-8ae2-ed270bf46c11" />
+
+
+The diagram below shows the caching flow.
+
+When a user retrieves a chat’s messages, the backend first checks whether the last 100 messages are already stored within Redis. If they are, Redis returns the cached messages directly to the backend, which then sends them back to the user. If they are not in Redis, Redis fetches the last 100 messages from the Mongo database, caches them, and sends them to the backend. The backend then returns the response to the user. Note that if a user deletes a message, then the cache is invalidated and the most recent 100 messages are fetched from the Mongo database and cached in Redis for the respective chat.
 <img width="883" height="531" alt="Screenshot_20261015_232850" src="https://github.com/user-attachments/assets/7530c374-c1c4-4170-ae4c-102bbab994cc" />
 
 ## Project Structure
