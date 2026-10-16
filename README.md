@@ -27,6 +27,32 @@ A couple of months ago I decided I wanted to learn Go, so I built a static load 
 ## What I strived to achieve and learn through this project
 The goals of this project were to learn how to write an efficient backend in Go, implement REST APIs in Go, learn Redis pub/sub, improve my system design skills, and improve my overall Go programming skills.
 ## Project Features
+1. **Real-Time Messaging System**
+    - Users can send messages to other users in real-time via WebSocket technology.
+    - Users can delete sent messages.
+    - If a chat does not exist between two users and a user sends a message, a message request is sent to the receiver.
+    - If the receiver accepts the message, the chat remains and users can continue sending each other messages.
+    - If the chat request is rejected by the receiver, the chat and request objects are deleted from the database.
+
+2. **Message Caching**
+    - The last 100 messages sent in a chat are cached in Redis.
+    - This lowers message retrieval latency and reduces the number of database fetches without compromising functionality.
+    - If a user deletes a message in a chat, the respective messages cache is invalidated.
+    
+3. **User Searching System**
+    - Users can search for other users by username and send them message requests.
+    - This also includes searching users within their existing contacts.
+    - Database indexing was used to increase database search performance.
+
+4. **Server-Side Sessions**
+    - The application makes use of server-side sessions to prevent client-side attacks such as cookie stealing, which could lead to account takeover.
+    - Every user server session is created upon a successful login and lasts 1 hour.
+    
+5. **Login System**
+    - Users can log in and create accounts, granted that their username is not already taken.
+    - Password requirements are implemented following the latest NIST guidelines.
+    - The login system features email validity checks, password complexity checks, and username availability checks.
+
 ## Project Architecture
 ## Project Structure
 ## Getting Started
