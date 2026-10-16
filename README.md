@@ -38,6 +38,11 @@ The goals of this project were to learn how to write an efficient backend in Go,
     - The last 100 messages sent in a chat are cached in Redis.
     - This lowers message retrieval latency and reduces the number of database fetches without compromising functionality.
     - If a user deletes a message in a chat, the respective messages cache is invalidated.
+      
+3. **Redis Pub/Sub**
+    - The application publishes and subscribes to two Redis events: "Message" and "Request".
+    - A goroutine is started on startup of the Go backend that handles subscriptions to the "Message" and "Request" Redis events.
+    - Every user is subscribed to both events, so when another user sends them a chat request or a message, they receive it in real time through the combined WebSocket and Redis pub/sub pipeline.
     
 3. **User Searching System**
     - Users can search for other users by username and send them message requests.
