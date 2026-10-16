@@ -57,6 +57,8 @@ The goals of this project were to learn how to write an efficient backend in Go,
     - Users can log in and create accounts, granted that their username is not already taken.
     - Password requirements are implemented following the latest NIST guidelines.
     - The login system features email validity checks, password complexity checks, and username availability checks.
+6. **CI Pipeline**
+    - A CI pipeline is executed upon every push to main which scans for exposed credentials within the entire repository and its history.
 
 ## Project Architecture
 <img width="1168" height="767" alt="Screenshot_20261016_015359" src="https://github.com/user-attachments/assets/a9496a85-1fdc-4b78-a638-7456ca976f58" />
