@@ -61,6 +61,12 @@ The goals of this project were to learn how to write an efficient backend in Go,
     - A CI pipeline is executed upon every push to main which scans for exposed credentials within the entire repository and its history.
 
 ## Project Architecture
+The diagram below shows a high-level overview of the application's architecture and flow.
+
+Upon successful login, a user opens two web socket channels — one for messaging and one for chat requests — so that messages and requests come in real time.
+
+The diagram depicts the flow of User A sending User B a message via the `/SendMessage` endpoint. The message object is cached in the Redis database and stored in the Mongo database, which acts as the permanent source of truth. This is to ensure that even if the recipient is not online at the time when a message is sent, they will still be able to read the messages when they come back. Next, the backend publishes a “Message” event, which is forwarded to the users subscribed to this topic. The message reaches the recipient via the socket read channels. If the ConversationID within the Redis “Message” event object matches a ConversationID that a user is a part of, then it is sent to them. That way nobody else but the intended recipient receives the message. Note that the message that the user sent is also sent to their socket channel to ensure that they also see the message in the chat in real time. A similar flow is used when a user sends the first message to another user, i.e., a chat request is sent.
+
 <img width="1168" height="767" alt="Screenshot_20261016_015359" src="https://github.com/user-attachments/assets/a9496a85-1fdc-4b78-a638-7456ca976f58" />
 <img width="852" height="544" alt="Screenshot_20261015_225102" src="https://github.com/user-attachments/assets/be498c7a-2f79-4ce5-8ae2-ed270bf46c11" />
 <img width="883" height="531" alt="Screenshot_20261015_232850" src="https://github.com/user-attachments/assets/7530c374-c1c4-4170-ae4c-102bbab994cc" />
