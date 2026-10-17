@@ -76,5 +76,54 @@ When a user retrieves a chat’s messages, the backend first checks whether the 
 <img width="883" height="531" alt="Screenshot_20261015_232850" src="https://github.com/user-attachments/assets/7530c374-c1c4-4170-ae4c-102bbab994cc" />
 
 ## Project Structure
+The project structure is separated in two parts - Backend and Frontend. You can find the project's folder tree at the end of this section.
+
+### Backend
+The Backend directory consists of 7 sub-directories - `GlobalVariables`, `Handlers`, `HelperFunctions`, `Middlewares`, `Mongo`, `Redis`, `WebSockets`.
+#### GlobalVariables
+This directory contains all of the global variables and response objects that the backend depends on.
+#### Handlers
+This directory contains all of the REST API route handlers.
+#### HelperFunctions
+This directory contains all of the helper functions that the Handlers depend on for Chats, Users, User Session, and data validation.
+#### Middlewares
+This directory contains all of the middlewares in use - Auth and CORS.
+#### Mongo
+This directory contains all of the Mongo configuration files - the server connection and initialisation module, users index creation file, data models, and data types.
+#### Redis
+This directory contains the Redis configuration files similar to the Mongo directory - a configuration file, Structs for Redis, and Redis event subscription handlers.
+#### WebSockets
+This directory contains all of the web socket-related configuration - active connections hub initialisation, related Structs, and chat request and message request pipeline logic built upon the Redis events.
+
+### Frontend
+The Frontend directory consists of 3 sub-directories - `Helpers`, `Types`, and `app`, which contains all of the React components that the application makes use of. Note that `app` is the default Next.js routing directory and thus every PascalCase component inside of it is a frontend route.
+
+#### Helpers
+This directory contains the login and register functions, which are called from within the frontend components. This is to achieve modularity and separation of concerns.
+
+#### Types
+This directory contains all of the TypeScript types that the application makes use of.
+```
+.
+├── Backend
+│   ├── GlobalVariables
+│   ├── Handlers
+│   ├── HelperFunctions
+│   ├── Middlewares
+│   ├── Mongo
+│   ├── Redis
+│   └── WebSockets
+└── frontend
+    ├── Helpers
+    ├── Types
+    ├── app
+    │   ├── ChatBox
+    │   ├── ChatList
+    │   ├── MessageBox
+    │   ├── RegisteredHome
+    │   ├── login
+    │   └── register
+    └── public
+```
 ## Getting Started
 ## Improvement Areas
