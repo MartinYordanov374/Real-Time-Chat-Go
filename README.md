@@ -126,4 +126,21 @@ This directory contains all of the TypeScript types that the application makes u
     └── public
 ```
 ## Getting Started
+You only need to have Docker and Docker Compose installed on your machine. 
+
+Once you have them installed, everything else will be taken care of automatically. The steps to running the project are as follows:
+
+First, navigate to your terminal and clone the project on your machine:
+
+```git clone https://github.com/MartinYordanov374/Real-Time-Chat-Go.git```
+
+Once the project is cloned, navigate to the repository:
+
+```cd ./Real-Time-Chat-Go ```
+
+Run the Docker Compose command:
+
+```docker compose up --build```
+
+Make sure that the Docker Daemon is running before you run the above commands!
 ## Improvement Areas
