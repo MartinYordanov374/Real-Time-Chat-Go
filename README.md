@@ -144,3 +144,8 @@ Run the Docker Compose command:
 
 Make sure that the Docker Daemon is running before you run the above commands!
 ## Improvement Areas
+1. Encryption
+    - Currently the only thing protecting user data on the database is password hashing, other than that anybody could read everything on the database, chats included, if they have even read-only access.
+2. Optimization
+    - Certain parts of the project could be optimised to achieve O(1) instead of O(n).
+    - Database queries and/or their execution could be optimised to reduce response latency.
